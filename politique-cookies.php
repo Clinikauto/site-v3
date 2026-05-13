@@ -59,6 +59,11 @@ $showAdminReturn = catalog_is_admin_session_active();
 
             <h3>5. Contact</h3>
             <p>Pour toute question: <a href="mailto:clinikauto74@gmail.com">clinikauto74@gmail.com</a>.</p>
+
+            <h3>6. Propriete intellectuelle</h3>
+            <p>L'ensemble des contenus du site Clinik Auto (textes, images, graphismes, logo, structure, scripts, code source et base de donnees) est protege par le droit d'auteur et le droit de la propriete intellectuelle.</p>
+            <p>Toute reproduction, representation, adaptation, extraction ou reutilisation, totale ou partielle, sur tout support, sans autorisation ecrite prealable de Clinik Auto, est interdite.</p>
+            <p>Tous droits reserves. Pour toute demande d'autorisation: <a href="mailto:clinikauto74@gmail.com">clinikauto74@gmail.com</a>.</p>
         </section>
     </main>
 
