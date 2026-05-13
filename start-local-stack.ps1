@@ -33,6 +33,9 @@ if (-not (Get-Process mariadbd -ErrorAction SilentlyContinue)) {
 # Start PHP built-in server (8001) only if not already running.
 if (-not (Get-Process php -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq $phpExe })) {
     $phpArgs = @(
+        "-d", "opcache.enable=0",
+        "-d", "opcache.enable_cli=0",
+        "-d", "opcache.revalidate_freq=0",
         "-d", "upload_max_filesize=50M",
         "-d", "post_max_size=50M",
         "-d", "memory_limit=256M",

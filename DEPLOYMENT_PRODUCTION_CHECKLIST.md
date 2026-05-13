@@ -23,6 +23,14 @@
 - Changer ADMIN_PASSWORD_HASH avec un hash neuf.
 - Restreindre l'acces HTTP a admin.php et admin_gate.php (WAF, firewall, ou .htaccess selon hebergeur).
 - Verifier que config.php n'est pas telechargeable publiquement.
+- Verifier que .env n'est jamais accessible via HTTP (bloque par .htaccess).
+- Retirer/neutraliser les utilitaires debug avant mise en ligne (test_*.php, tmp_*.php, email-log.php, scripts diag_*, *.bak/*.new).
+
+## 4.1) Rotation obligatoire des secrets
+- Regenerer le mot de passe SMTP applicatif (si Gmail: nouveau mot de passe d'application).
+- Regenerer GOOGLE_CLIENT_SECRET et surtout GOOGLE_REFRESH_TOKEN.
+- Regenerer ADMIN_HIDDEN_ENTRY_KEY et le mot de passe admin (nouveau hash bcrypt).
+- Verifier que les anciennes valeurs ne fonctionnent plus.
 
 ## 5) Verification fonctionnelle
 - Ouvrir admin_gate.php puis se connecter a admin.php.
@@ -40,3 +48,4 @@
 - Sauvegarde complete: fichiers + base.
 - Activer HTTPS et forcer la redirection HTTP -> HTTPS.
 - Mettre en place supervision (uptime + espace disque + erreurs PHP).
+- Lancer un smoke test HTTP: /, /catalogue/catalogue.php, /catalogue/occasion.php, /catalogue/pieces.php, /contact/contact.php, /rdv/rdv.php, /devis/devis.php, /admin_gate.php.

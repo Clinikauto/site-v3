@@ -7,6 +7,10 @@
 
 session_start();
 
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
+
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/includes/catalog_store.php';
 
@@ -126,6 +130,21 @@ function gate_send_code_email(string $code): bool
     return catalog_send_email($target, $subject, $body, '');
 }
 
+function gate_is_local_runtime(): bool
+{
+    $host = strtolower(trim((string) ($_SERVER['HTTP_HOST'] ?? '')));
+    if ($host === 'localhost' || strpos($host, '127.0.0.1') !== false || strpos($host, 'localhost:') === 0) {
+        return true;
+    }
+
+    $remote = trim((string) ($_SERVER['REMOTE_ADDR'] ?? ''));
+    if ($remote === '127.0.0.1' || $remote === '::1') {
+        return true;
+    }
+
+    return false;
+}
+
 // ─── Routing ──────────────────────────────────────────────────────────────────
 
 $action   = trim((string) ($_POST['action'] ?? ''));
@@ -143,12 +162,21 @@ if (!empty($_SESSION['catalog_admin_gate_ok'])) {
 if ($action === 'send_code') {
     $code = gate_issue_code();
     if (gate_send_code_email($code)) {
-        $infoMsg = 'Code envoyé à l\'adresse email autorisée. Valable 10 minutes.';
+        if (gate_is_local_runtime()) {
+            $infoMsg = 'Mode local : code de connexion = ' . $code . ' (valable 10 minutes).';
+        } else {
+            $infoMsg = 'Code envoyé à l\'adresse email autorisée. Valable 10 minutes.';
+        }
         $step = 'verify';
     } else {
-        gate_clear_state();
-        $errorMsg = 'Erreur lors de l\'envoi de l\'email. Vérifiez la configuration SMTP.';
-        $step = 'send';
+        if (gate_is_local_runtime()) {
+            $infoMsg = 'Mode local détecté : email indisponible. Code de test : ' . $code . ' (valable 10 minutes).';
+            $step = 'verify';
+        } else {
+            gate_clear_state();
+            $errorMsg = 'Erreur lors de l\'envoi de l\'email. Vérifiez la configuration SMTP.';
+            $step = 'send';
+        }
     }
 }
 
@@ -157,12 +185,21 @@ if ($action === 'resend_code') {
     gate_clear_state();
     $code = gate_issue_code();
     if (gate_send_code_email($code)) {
-        $infoMsg = 'Nouveau code envoyé.';
+        if (gate_is_local_runtime()) {
+            $infoMsg = 'Mode local : nouveau code de connexion = ' . $code . ' (valable 10 minutes).';
+        } else {
+            $infoMsg = 'Nouveau code envoyé.';
+        }
         $step = 'verify';
     } else {
-        gate_clear_state();
-        $errorMsg = 'Erreur lors de l\'envoi de l\'email.';
-        $step = 'send';
+        if (gate_is_local_runtime()) {
+            $infoMsg = 'Mode local détecté : email indisponible. Nouveau code de test : ' . $code . ' (valable 10 minutes).';
+            $step = 'verify';
+        } else {
+            gate_clear_state();
+            $errorMsg = 'Erreur lors de l\'envoi de l\'email.';
+            $step = 'send';
+        }
     }
 }
 

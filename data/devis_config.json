@@ -1,0 +1,98 @@
+{
+    "categories": [
+        {
+            "id": "entretien-revision",
+            "title": "Entretien & Revision",
+            "icon": "🔄",
+            "hidden_on_devis": false,
+            "options": [
+                {
+                    "label": "Vidange moteur",
+                    "unavailable_on_devis": false,
+                    "icon": "🛢️"
+                },
+                {
+                    "label": "Changement filtre a huile",
+                    "unavailable_on_devis": false,
+                    "icon": "🧴"
+                },
+                {
+                    "label": "Controle freins",
+                    "unavailable_on_devis": false,
+                    "icon": "🛑"
+                },
+                {
+                    "label": "Controle batterie",
+                    "unavailable_on_devis": false,
+                    "icon": "🔋"
+                }
+            ]
+        },
+        {
+            "id": "reparation-diagnostic",
+            "title": "Reparation & Diagnostic",
+            "icon": "🔩",
+            "hidden_on_devis": false,
+            "options": [
+                {
+                    "label": "Diagnostic electronique",
+                    "unavailable_on_devis": false,
+                    "icon": "🧪"
+                },
+                {
+                    "label": "Reparation embrayage",
+                    "unavailable_on_devis": false,
+                    "icon": "⚙️"
+                },
+                {
+                    "label": "Reparation suspension",
+                    "unavailable_on_devis": false,
+                    "icon": "🔩"
+                },
+                {
+                    "label": "Reparation climatisation",
+                    "unavailable_on_devis": false,
+                    "icon": "❄️"
+                }
+            ]
+        },
+        {
+            "id": "services-auto",
+            "title": "Nos services auto",
+            "icon": "⭐",
+            "hidden_on_devis": false,
+            "options": [
+                {
+                    "label": "Recherche vehicule d'occasion",
+                    "unavailable_on_devis": false,
+                    "icon": "🚗"
+                },
+                {
+                    "label": "Controle avant achat",
+                    "unavailable_on_devis": false,
+                    "icon": "🔎"
+                },
+                {
+                    "label": "Enlevement VHU",
+                    "unavailable_on_devis": false,
+                    "icon": "🚚"
+                },
+                {
+                    "label": "Controle Technique",
+                    "unavailable_on_devis": false,
+                    "icon": "✅"
+                },
+                {
+                    "label": "Pre-Controle Technique",
+                    "unavailable_on_devis": false,
+                    "icon": "☑️"
+                },
+                {
+                    "label": "Remorquage",
+                    "unavailable_on_devis": false,
+                    "icon": "🪝"
+                }
+            ]
+        }
+    ]
+}

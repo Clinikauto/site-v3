@@ -16,14 +16,69 @@ $selected = $selectedId > 0 ? catalog_find_item($selectedId, 'vehicle') : null;
 if (!$selected && !empty($items)) {
     $selected = $items[0];
 }
+
+$vehicleListItems = [];
+foreach (array_slice($items, 0, 12) as $index => $item) {
+    $vehicleListItems[] = [
+        '@type' => 'ListItem',
+        'position' => $index + 1,
+        'url' => 'https://www.clinikauto.fr/catalogue/occasion.php?id=' . (int) ($item['id'] ?? 0),
+        'item' => [
+            '@type' => 'Car',
+            'name' => (string) ($item['title'] ?? ''),
+            'description' => (string) (($item['subtitle'] ?? '') ?: ($item['description'] ?? '')),
+            'image' => catalog_primary_image($item),
+            'offers' => [
+                '@type' => 'Offer',
+                'priceCurrency' => 'EUR',
+                'price' => (string) ((float) ($item['price'] ?? 0)),
+                'availability' => (($item['status'] ?? '') === 'reserved')
+                    ? 'https://schema.org/SoldOut'
+                    : 'https://schema.org/InStock',
+                'url' => 'https://www.clinikauto.fr/catalogue/occasion.php?id=' . (int) ($item['id'] ?? 0)
+            ]
+        ]
+    ];
+}
+
+$occasionStructuredData = [
+    '@context' => 'https://schema.org',
+    '@graph' => [
+        [
+            '@type' => 'CollectionPage',
+            '@id' => 'https://www.clinikauto.fr/catalogue/occasion.php#webpage',
+            'url' => 'https://www.clinikauto.fr/catalogue/occasion.php',
+            'name' => 'Voitures d\'Occasion à Scionzier | Clinik Auto',
+            'description' => 'Véhicules d\'occasion contrôlés et garantis chez Clinik Auto à Scionzier.',
+            'about' => [
+                '@id' => 'https://www.clinikauto.fr/#garage'
+            ]
+        ],
+        [
+            '@type' => 'BreadcrumbList',
+            '@id' => 'https://www.clinikauto.fr/catalogue/occasion.php#breadcrumb',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Accueil', 'item' => 'https://www.clinikauto.fr/'],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Catalogue', 'item' => 'https://www.clinikauto.fr/catalogue/catalogue.php'],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => 'Véhicules d\'occasion', 'item' => 'https://www.clinikauto.fr/catalogue/occasion.php']
+            ]
+        ],
+        [
+            '@type' => 'ItemList',
+            'name' => 'Véhicules d\'occasion disponibles',
+            'numberOfItems' => count($vehicleListItems),
+            'itemListElement' => $vehicleListItems
+        ]
+    ]
+];
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voitures d'Occasion à Scionzier (74) | Clinik Auto – Vente VO Haute-Savoie</title>
-    <meta name="description" content="Achetez votre voiture d'occasion chez Clinik Auto à Scionzier (74950). Véhicules contrôlés et garantis, prix compétitifs. Réservez une visite en ligne dès maintenant.">
+    <title>Voitures Occasion Scionzier Cluses (74) | VO Contrôlées & Garanties | Clinik Auto</title>
+    <meta name="description" content="Achetez une voiture d'occasion contrôlée chez Clinik Auto, garage à Scionzier (74950) proche de Cluses, Bonneville, Sallanches. Réservation de visite en ligne – 06 20 18 56 27.">
     <meta name="keywords" content="voiture occasion Scionzier, vente VO 74, achat véhicule occasion Cluses, voiture garantie Haute-Savoie, occasion contrôlée 74950, VO Bonneville, achat auto Sallanches">
     <meta name="robots" content="index, follow">
     <meta name="geo.region" content="FR-74">
@@ -43,18 +98,10 @@ if (!$selected && !empty($items)) {
     <link rel="stylesheet" href="../assets/style.css">
     <?php echo catalog_get_google_analytics_script(); ?>
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.clinikauto.fr/"},
-        {"@type": "ListItem", "position": 2, "name": "Catalogue", "item": "https://www.clinikauto.fr/catalogue/catalogue.php"},
-        {"@type": "ListItem", "position": 3, "name": "Véhicules d'occasion", "item": "https://www.clinikauto.fr/catalogue/occasion.php"}
-      ]
-    }
+        <?php echo json_encode($occasionStructuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
     </script>
 </head>
-<body>
+<body class="public-page">
     <header>
         <div class="site-brand">
             <a class="site-brand-link" href="../index.html" aria-label="Clinik Auto accueil">
@@ -76,8 +123,8 @@ if (!$selected && !empty($items)) {
         <div class="inventory-page-head">
             <div>
                 <span class="hero-badge">Occasion</span>
-                <h2>Nos véhicules disponibles</h2>
-                <p>Cliquez sur une ligne pour ouvrir la fiche detaillee du vehicule et reserver une visite.</p>
+                <h1>Nos véhicules d'occasion disponibles</h1>
+                <p>Cliquez sur une ligne pour ouvrir la fiche détaillée du véhicule et réserver une visite.</p>
             </div>
             <a class="cta-link cta-link-small" href="pieces.php">Voir les pièces d'occasion →</a>
         </div>
@@ -106,7 +153,7 @@ if (!$selected && !empty($items)) {
                                             data-vehicle-title="<?php echo catalog_escape($item['title']); ?>"
                                             data-vehicle-price="<?php echo catalog_escape((string) ($item['price'] ?? '')); ?>"
                                         >
-                                        Selectionner
+                                        Sélectionner
                                     </label>
                                 <?php endif; ?>
                             </span>
@@ -143,7 +190,7 @@ if (!$selected && !empty($items)) {
                             <p><?php echo nl2br(catalog_escape($selected['description'])); ?></p>
                         </article>
                         <article class="detail-card">
-                            <h4>Renseignements vehicule</h4>
+                            <h4>Renseignements véhicule</h4>
                             <p><?php echo nl2br(catalog_escape($selected['specs'])); ?></p>
                         </article>
                     </div>
@@ -154,13 +201,13 @@ if (!$selected && !empty($items)) {
 
                     <div class="detail-actions">
                         <?php if (($selected['status'] ?? '') === 'reserved'): ?>
-                            <span class="cta-link cta-link-disabled">Vehicule actuellement reserve</span>
+                            <span class="cta-link cta-link-disabled">Véhicule actuellement réservé</span>
                         <?php else: ?>
                             <?php if (!empty($selected['transaction_in_progress'])): ?>
                                 <div class="deposit-note">
-                                    <strong>Transaction en cours :</strong> un dossier est deja ouvert sur ce vehicule. Vous pouvez quand meme demander un essai ulterieur en cas de non-conclusion.
+                                    <strong>Transaction en cours :</strong> un dossier est déjà ouvert sur ce véhicule. Vous pouvez quand même demander un essai ultérieur en cas de non-conclusion.
                                 </div>
-                                <a class="cta-link" href="<?php echo catalog_escape(catalog_build_contact_link($selected)); ?>">Demander un essai ulterieur →</a>
+                                <a class="cta-link" href="<?php echo catalog_escape(catalog_build_contact_link($selected)); ?>">Demander un essai ultérieur →</a>
                             <?php else: ?>
                                 <div class="devis-form-actions">
                                     <a
@@ -214,8 +261,8 @@ if (!$selected && !empty($items)) {
             destination.searchParams.set('selected_vehicles_ids', selectedIds.join(','));
             destination.searchParams.set('selected_vehicles_titles', selectedTitles.join(' | '));
             if (selectedIds.length > 1) {
-                destination.searchParams.set('sujet', 'Reservation visite vehicules - ' + selectedIds.length + ' vehicules selectionnes');
-                destination.searchParams.set('message', 'Bonjour, je souhaite reserver une visite pour les vehicules suivants :\n' + selectedTitles.map(function (t) { return '- ' + t; }).join('\n') + '\nMerci de me proposer un rendez-vous.');
+                destination.searchParams.set('sujet', 'Réservation visite véhicules - ' + selectedIds.length + ' véhicules sélectionnés');
+                destination.searchParams.set('message', 'Bonjour, je souhaite réserver une visite pour les véhicules suivants :\n' + selectedTitles.map(function (t) { return '- ' + t; }).join('\n') + '\nMerci de me proposer un rendez-vous.');
                 destination.searchParams.set('annonce_id', String(selectedIds[0]));
                 destination.searchParams.set('annonce_title', selectedTitles[0] || '');
             }

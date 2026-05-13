@@ -26,14 +26,70 @@ $selectedTransferCountdown = '';
 if ($selectedTransferSeconds !== null) {
     $selectedTransferCountdown = sprintf('%02dh %02dmin', (int) floor($selectedTransferSeconds / 3600), (int) floor(($selectedTransferSeconds % 3600) / 60));
 }
+
+$partListItems = [];
+foreach (array_slice($items, 0, 12) as $index => $item) {
+    $partListItems[] = [
+        '@type' => 'ListItem',
+        'position' => $index + 1,
+        'url' => 'https://www.clinikauto.fr/catalogue/pieces.php?id=' . (int) ($item['id'] ?? 0),
+        'item' => [
+            '@type' => 'Product',
+            'name' => (string) ($item['title'] ?? ''),
+            'description' => (string) (($item['subtitle'] ?? '') ?: ($item['description'] ?? '')),
+            'image' => catalog_primary_image($item),
+            'itemCondition' => 'https://schema.org/UsedCondition',
+            'offers' => [
+                '@type' => 'Offer',
+                'priceCurrency' => 'EUR',
+                'price' => (string) ((float) ($item['price'] ?? 0)),
+                'availability' => (($item['status'] ?? '') === 'reserved')
+                    ? 'https://schema.org/SoldOut'
+                    : 'https://schema.org/InStock',
+                'url' => 'https://www.clinikauto.fr/catalogue/pieces.php?id=' . (int) ($item['id'] ?? 0)
+            ]
+        ]
+    ];
+}
+
+$piecesStructuredData = [
+    '@context' => 'https://schema.org',
+    '@graph' => [
+        [
+            '@type' => 'CollectionPage',
+            '@id' => 'https://www.clinikauto.fr/catalogue/pieces.php#webpage',
+            'url' => 'https://www.clinikauto.fr/catalogue/pieces.php',
+            'name' => 'Pièces Auto d\'Occasion à Scionzier | Clinik Auto',
+            'description' => 'Pièces détachées automobiles d\'occasion contrôlées chez Clinik Auto à Scionzier.',
+            'about' => [
+                '@id' => 'https://www.clinikauto.fr/#garage'
+            ]
+        ],
+        [
+            '@type' => 'BreadcrumbList',
+            '@id' => 'https://www.clinikauto.fr/catalogue/pieces.php#breadcrumb',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Accueil', 'item' => 'https://www.clinikauto.fr/'],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Catalogue', 'item' => 'https://www.clinikauto.fr/catalogue/catalogue.php'],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => 'Pièces d\'occasion', 'item' => 'https://www.clinikauto.fr/catalogue/pieces.php']
+            ]
+        ],
+        [
+            '@type' => 'ItemList',
+            'name' => 'Pièces auto d\'occasion disponibles',
+            'numberOfItems' => count($partListItems),
+            'itemListElement' => $partListItems
+        ]
+    ]
+];
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pièces Auto d'Occasion à Scionzier (74) | Clinik Auto – Jantes, Freinage, Moteur</title>
-    <meta name="description" content="Clinik Auto à Scionzier (74950) propose des pièces détachées automobiles d'occasion contrôlées : jantes, freinage, moteur, carrosserie. Haute-Savoie (74).">
+    <title>Pièces Auto Occasion Scionzier (74950) | Jantes, Freinage, Moteur | Clinik Auto</title>
+    <meta name="description" content="Pièces détachées auto d'occasion contrôlées à Scionzier (74950) : jantes, freinage, moteur, carrosserie. Livraison ou retrait garage – proche Cluses, Bonneville, Sallanches. Tél : 06 20 18 56 27.">
     <meta name="keywords" content="pièces auto occasion Scionzier, pièces détachées 74, jantes occasion Cluses, freinage auto 74950, pièces voiture Haute-Savoie, carrosserie occasion 74, moteur occasion Bonneville">
     <meta name="robots" content="index, follow">
     <meta name="geo.region" content="FR-74">
@@ -53,18 +109,10 @@ if ($selectedTransferSeconds !== null) {
     <link rel="stylesheet" href="../assets/style.css">
     <?php echo catalog_get_google_analytics_script(); ?>
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.clinikauto.fr/"},
-        {"@type": "ListItem", "position": 2, "name": "Catalogue", "item": "https://www.clinikauto.fr/catalogue/catalogue.php"},
-        {"@type": "ListItem", "position": 3, "name": "Pièces d'occasion", "item": "https://www.clinikauto.fr/catalogue/pieces.php"}
-      ]
-    }
+        <?php echo json_encode($piecesStructuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
     </script>
 </head>
-<body>
+<body class="public-page">
     <header>
         <div class="site-brand">
             <a class="site-brand-link" href="../index.html" aria-label="Clinik Auto accueil">
@@ -86,8 +134,8 @@ if ($selectedTransferSeconds !== null) {
         <div class="inventory-page-head">
             <div>
                 <span class="hero-badge">Pièces</span>
-                <h2>Nos pièces d'occasion</h2>
-                <p>Cliquez sur une ligne pour consulter la fiche detaillee et initier la reservation de la piece selectionnee.</p>
+                <h1>Nos pièces auto d'occasion</h1>
+                <p>Cliquez sur une ligne pour consulter la fiche détaillée et initier la réservation de la pièce sélectionnée.</p>
             </div>
             <a class="cta-link cta-link-small" href="occasion.php">Voir les véhicules d'occasion →</a>
         </div>
@@ -116,7 +164,7 @@ if ($selectedTransferSeconds !== null) {
                                             data-part-title="<?php echo catalog_escape($item['title']); ?>"
                                             data-part-deposit="<?php echo catalog_escape((string) catalog_reservation_amount($item['price'])); ?>"
                                         >
-                                        Selectionner
+                                        Sélectionner
                                     </label>
                                 <?php elseif (!empty($item['transaction_in_progress']) && empty($item['payment_confirmed'])): ?>
                                     <small class="part-selector-note">Positionnement en file uniquement</small>
@@ -155,13 +203,13 @@ if ($selectedTransferSeconds !== null) {
                             <p><?php echo nl2br(catalog_escape($selected['description'])); ?></p>
                         </article>
                         <article class="detail-card">
-                            <h4>Renseignements piece</h4>
+                            <h4>Renseignements pièce</h4>
                             <p><?php echo nl2br(catalog_escape($selected['specs'])); ?></p>
                         </article>
                     </div>
 
                     <div class="deposit-note">
-                        <strong>Acompte de reservation :</strong> <?php echo $deposit; ?> € par virement instantane, soit 30 % du montant affiche.
+                        <strong>Acompte de réservation :</strong> <?php echo $deposit; ?> € par virement instantané, soit 30 % du montant affiché.
                     </div>
 
                     <div class="deposit-note multi-deposit-note">
@@ -209,7 +257,7 @@ if ($selectedTransferSeconds !== null) {
                         <?php endif; ?>
                     </div>
                 <?php else: ?>
-                    <p>Aucune annonce piece n'est disponible pour le moment.</p>
+                    <p>Aucune annonce pièce n'est disponible pour le moment.</p>
                 <?php endif; ?>
             </section>
         </div>
@@ -218,9 +266,9 @@ if ($selectedTransferSeconds !== null) {
             <div class="virement-modal" id="virement-modal" hidden>
                 <div class="virement-modal-card" role="dialog" aria-modal="true" aria-labelledby="virement-modal-title">
                     <h3 id="virement-modal-title">Confirmation du virement</h3>
-                    <p>Pour la securite de vos donnees bancaires, faites le virement depuis chez vous puis confirmez ci-dessous pour continuer votre parcours de reservation.</p>
-                    <p><strong>Nombre d'articles selectionnes :</strong> <span id="virement-selected-count">1</span></p>
-                    <p><strong>Montant total de l'acompte a virer :</strong> <span id="virement-selected-deposit"><?php echo catalog_escape(number_format($selectedDepositRaw, 2, ',', ' ')); ?> €</span></p>
+                    <p>Pour la sécurité de vos données bancaires, faites le virement depuis chez vous puis confirmez ci-dessous pour continuer votre parcours de réservation.</p>
+                    <p><strong>Nombre d'articles sélectionnés :</strong> <span id="virement-selected-count">1</span></p>
+                    <p><strong>Montant total de l'acompte à virer :</strong> <span id="virement-selected-deposit"><?php echo catalog_escape(number_format($selectedDepositRaw, 2, ',', ' ')); ?> €</span></p>
                     <div class="virement-modal-bank">
                         <p><strong>Compte :</strong> <?php echo catalog_escape((string) ($selectedBankAccount['label'] ?? 'Compte principal')); ?></p>
                         <p><strong>Beneficiaire :</strong> <?php echo catalog_escape((string) ($selectedBankAccount['beneficiary'] ?? '')); ?></p>
@@ -237,7 +285,7 @@ if ($selectedTransferSeconds !== null) {
                     </div>
                     <label class="checkbox-toggle">
                         <input type="checkbox" id="virement-confirm-checkbox" value="1">
-                        Je confirme avoir effectue le virement instantane depuis chez moi.
+                        Je confirme avoir effectué le virement instantané depuis chez moi.
                     </label>
                     <div class="admin-form-actions" style="gap:0.6rem; flex-wrap:wrap;">
                         <button type="button" class="btn-secondary" id="virement-cancel">Annuler</button>

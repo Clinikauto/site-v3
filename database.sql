@@ -1,5 +1,5 @@
 -- Base de données pour Clinik Auto
--- À exécuter dans phpMyAdmin de Webator
+-- À exécuter dans phpMyAdmin (local ou o2switch)
 
 -- Table des rendez-vous
 CREATE TABLE IF NOT EXISTS rendez_vous (

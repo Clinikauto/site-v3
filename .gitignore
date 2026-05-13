@@ -2,3 +2,18 @@
 data/admin_gate_code.json
 data/admin_ops.log
 data/catalog_data.json
+data/admin_password_reset.json
+email-logs/*.json
+cookies.txt
+process_cmd.txt
+mailhog.exe
+*.log
+
+# Artefacts temporaires / debug
+*.bak
+*.new
+tmp_*.php
+test_*.php
+diag_*.ps1
+diag_*.php
+extracted_section.txt

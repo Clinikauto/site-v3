@@ -13,12 +13,13 @@ $showAdminReturn = catalog_is_admin_session_active();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="noindex, follow">
     <title>Politique cookies | Clinik Auto</title>
+    <link rel="canonical" href="https://www.clinikauto.fr/politique-cookies.php">
     <link rel="stylesheet" href="assets/style.css">
     <?php echo catalog_get_google_analytics_script(); ?>
 </head>
-<body>
+<body class="public-page">
     <header>
         <div class="site-brand">
             <a class="site-brand-link" href="index.html" aria-label="Clinik Auto accueil">

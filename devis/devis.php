@@ -16,14 +16,53 @@ $service_labels = [
 ];
 
 $service_label = $service_labels[$service] ?? "Toutes prestations";
+$devisConfig = catalog_devis_config_load();
+$devisCategories = (array) ($devisConfig['categories'] ?? []);
+
+$devisStructuredData = [
+    '@context' => 'https://schema.org',
+    '@graph' => [
+        [
+            '@type' => 'WebPage',
+            '@id' => 'https://www.clinikauto.fr/devis/devis.php#webpage',
+            'url' => 'https://www.clinikauto.fr/devis/devis.php',
+            'name' => 'Demande de devis auto | Clinik Auto',
+            'description' => 'Demande de devis gratuit pour révision, réparation et services auto chez Clinik Auto à Scionzier.',
+            'about' => [
+                '@id' => 'https://www.clinikauto.fr/#garage'
+            ]
+        ],
+        [
+            '@type' => 'BreadcrumbList',
+            '@id' => 'https://www.clinikauto.fr/devis/devis.php#breadcrumb',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Accueil', 'item' => 'https://www.clinikauto.fr/'],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Devis', 'item' => 'https://www.clinikauto.fr/devis/devis.php']
+            ]
+        ],
+        [
+            '@type' => 'Service',
+            'serviceType' => (string) $service_label,
+            'name' => 'Demande de devis ' . (string) $service_label,
+            'provider' => [
+                '@id' => 'https://www.clinikauto.fr/#garage'
+            ],
+            'areaServed' => 'Haute-Savoie',
+            'availableChannel' => [
+                '@type' => 'ServiceChannel',
+                'serviceUrl' => 'https://www.clinikauto.fr/devis/devis.php'
+            ]
+        ]
+    ]
+];
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demande de Devis Gratuit | Révision & Réparation Auto – Clinik Auto Scionzier (74)</title>
-    <meta name="description" content="Obtenez un devis gratuit pour la révision ou réparation de votre véhicule chez Clinik Auto à Scionzier (74950). Garage multimarque en Haute-Savoie. Réponse rapide.">
+    <title>Devis Gratuit Révision & Réparation Auto Scionzier (74) | Clinik Auto</title>
+    <meta name="description" content="Demandez votre devis gratuit en ligne : révision, entretien, réparation auto à Scionzier (74950). Garage multimarque proche Cluses, Bonneville, Sallanches. Réponse dans les meilleurs délais.">
     <meta name="keywords" content="devis révision voiture Scionzier, devis réparation auto 74, tarif entretien véhicule Haute-Savoie, devis mécanique gratuit 74950, prix révision Cluses, devis auto Bonneville">
     <meta name="robots" content="index, follow">
     <meta name="geo.region" content="FR-74">
@@ -42,17 +81,10 @@ $service_label = $service_labels[$service] ?? "Toutes prestations";
     <link rel="icon" type="image/png" href="../assets/logo.png">
     <link rel="stylesheet" href="../assets/style.css">
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.clinikauto.fr/"},
-        {"@type": "ListItem", "position": 2, "name": "Devis", "item": "https://www.clinikauto.fr/devis/devis.php"}
-      ]
-    }
+        <?php echo json_encode($devisStructuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
     </script>
 </head>
-<body>
+<body class="public-page">
     <header>
         <div class="site-brand">
             <a class="site-brand-link" href="../index.html" aria-label="Clinik Auto accueil">
@@ -71,7 +103,7 @@ $service_label = $service_labels[$service] ?? "Toutes prestations";
         </nav>
     </header>
     <main>
-        <h2>Demande de devis</h2>
+        <h1>Demande de devis automobile</h1>
         <p>Service sélectionné : <strong><?php echo htmlspecialchars($service_label); ?></strong></p>
         <p class="form-note">Cochez une ou plusieurs prestations. Le compteur s'incrémente automatiquement selon vos choix.</p>
 
@@ -83,36 +115,66 @@ $service_label = $service_labels[$service] ?? "Toutes prestations";
                 <span class="counter-badge">Prestations sélectionnées : <strong id="selected-count">0</strong></span>
             </div>
 
-            <h3>Révision</h3>
-            <div class="checklist-grid">
-                <label class="check-item"><input type="checkbox" class="prestation-checkbox" value="Vidange moteur">Vidange moteur</label>
-                <label class="check-item"><input type="checkbox" class="prestation-checkbox" value="Changement filtre à huile">Changement filtre à huile</label>
-                <label class="check-item"><input type="checkbox" class="prestation-checkbox" value="Contrôle freins">Contrôle freins</label>
-                <label class="check-item"><input type="checkbox" class="prestation-checkbox" value="Contrôle batterie">Contrôle batterie</label>
-            </div>
-
-            <h3>Réparation</h3>
-            <div class="checklist-grid">
-                <label class="check-item"><input type="checkbox" class="prestation-checkbox" value="Diagnostic électronique">Diagnostic électronique</label>
-                <label class="check-item"><input type="checkbox" class="prestation-checkbox" value="Réparation embrayage">Réparation embrayage</label>
-                <label class="check-item"><input type="checkbox" class="prestation-checkbox" value="Réparation suspension">Réparation suspension</label>
-                <label class="check-item"><input type="checkbox" class="prestation-checkbox" value="Réparation climatisation">Réparation climatisation</label>
-            </div>
-
-            <h3>Nos services auto</h3>
-            <div class="checklist-grid">
-                <label class="check-item"><input type="checkbox" class="prestation-checkbox" value="Recherche véhicule d'occasion">Recherche véhicule d'occasion</label>
-                <label class="check-item"><input type="checkbox" class="prestation-checkbox" value="Contrôle avant achat">Contrôle avant achat</label>
-                <label class="check-item"><input type="checkbox" class="prestation-checkbox" value="Enlèvement de véhicule hors d'usage">Enlèvement de véhicule hors d'usage</label>
-                <label class="check-item"><input type="checkbox" class="prestation-checkbox" value="Contrôle Technique">Contrôle Technique</label>
-                <label class="check-item"><input type="checkbox" class="prestation-checkbox" value="Pré-Contrôle Technique">Pré-Contrôle Technique</label>
-                <label class="check-item"><input type="checkbox" class="prestation-checkbox" value="Remorquage">Remorquage</label>
-            </div>
+            <?php foreach ($devisCategories as $category): ?>
+                <?php
+                    $categoryTitle = trim((string) ($category['title'] ?? ''));
+                    $categoryIcon = trim((string) ($category['icon'] ?? ''));
+                    $categoryHiddenOnDevis = !empty($category['hidden_on_devis']);
+                    $categoryOptions = (array) ($category['options'] ?? []);
+                    if ($categoryTitle === '' || $categoryHiddenOnDevis || empty($categoryOptions)) {
+                        continue;
+                    }
+                ?>
+                <div class="devis-category">
+                    <div class="devis-category-header">
+                        <span class="cat-icon"><?php echo htmlspecialchars($categoryIcon !== '' ? $categoryIcon : '🛠️', ENT_QUOTES, 'UTF-8'); ?></span>
+                        <h3><?php echo htmlspecialchars($categoryTitle, ENT_QUOTES, 'UTF-8'); ?></h3>
+                    </div>
+                    <div class="devis-category-body checklist-grid">
+                        <?php foreach ($categoryOptions as $option): ?>
+                            <?php 
+                                // Support both legacy string format and new object format
+                                if (is_array($option)) {
+                                    $optionLabel = trim((string) ($option['label'] ?? ''));
+                                    $optionUnavailable = !empty($option['unavailable_on_devis']);
+                                    $optionIcon = trim((string) ($option['icon'] ?? ''));
+                                } else {
+                                    $optionLabel = trim((string) $option);
+                                    $optionUnavailable = false;
+                                    $optionIcon = '';
+                                }
+                                if ($optionLabel === '') { 
+                                    continue; 
+                                }
+                            ?>
+                            <?php if ($optionUnavailable): ?>
+                                <div class="check-item unavailable-item" style="pointer-events:none;">
+                                    <input type="checkbox" class="prestation-checkbox" disabled value="<?php echo htmlspecialchars($optionLabel, ENT_QUOTES, 'UTF-8'); ?>" style="cursor:not-allowed;">
+                                    <?php if ($optionIcon !== ''): ?>
+                                        <span style="font-size:1rem; margin-right:0.35rem;"><?php echo htmlspecialchars($optionIcon, ENT_QUOTES, 'UTF-8'); ?></span>
+                                    <?php endif; ?>
+                                    <span style="color:#b91c1c;"><?php echo htmlspecialchars($optionLabel, ENT_QUOTES, 'UTF-8'); ?></span>
+                                    <span style="font-size:0.8rem; color:#b91c1c; margin-left:0.3rem;">(indisponible pour le moment)</span>
+                                </div>
+                            <?php else: ?>
+                                <label class="check-item">
+                                    <input type="checkbox" class="prestation-checkbox" value="<?php echo htmlspecialchars($optionLabel, ENT_QUOTES, 'UTF-8'); ?>">
+                                    <?php if ($optionIcon !== ''): ?>
+                                        <span style="font-size:1rem; margin-right:0.35rem;"><?php echo htmlspecialchars($optionIcon, ENT_QUOTES, 'UTF-8'); ?></span>
+                                    <?php endif; ?>
+                                    <span><?php echo htmlspecialchars($optionLabel, ENT_QUOTES, 'UTF-8'); ?></span>
+                                </label>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
 
             <div class="devis-form-actions">
                 <button type="submit" id="devis-submit-btn">Valider votre demande de devis →</button>
                 <button type="button" id="devis-continue-btn" class="btn-secondary">Continuer la navigation →</button>
             </div>
+            <p class="form-note">Aucune reservation automatique: nous vous recontactons rapidement pour confirmer avec vous.</p>
             <p class="form-note" id="devis-saved-notice" hidden>
                 Des prestations d'un autre service sont déjà mémorisées et seront incluses lors de la validation.
             </p>
@@ -132,6 +194,7 @@ $service_label = $service_labels[$service] ?? "Toutes prestations";
         <p class="footer-copy">&copy; 2026 Clinik Auto. Tous droits r&eacute;serv&eacute;s.</p>
     </footer>
 
+    <script src="../assets/conversion-tracking.js" defer></script>
     <script>
     (function () {
         var STORAGE_KEY = 'clinikauto_devis_prestations_v1';
@@ -192,10 +255,18 @@ $service_label = $service_labels[$service] ?? "Toutes prestations";
             }
         }
 
+        /* --- Mise à jour visuelle de l'état coché --- */
+        function updateCheckedStyle() {
+            checkboxes.forEach(function (cb) {
+                cb.closest('.check-item').classList.toggle('is-checked', cb.checked);
+            });
+        }
+
         /* --- Sauvegarde à chaque changement de case --- */
         checkboxes.forEach(function (cb) {
             cb.addEventListener('change', function () {
                 updateCounter();
+                updateCheckedStyle();
                 saveCurrent(mergedSelections());
             });
         });
@@ -224,6 +295,7 @@ $service_label = $service_labels[$service] ?? "Toutes prestations";
         /* --- Init --- */
         restoreCheckboxes();
         updateCounter();
+        updateCheckedStyle();
     })();
     </script>
 </body>

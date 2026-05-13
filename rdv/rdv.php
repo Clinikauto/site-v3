@@ -10,6 +10,43 @@ $showAdminReturn = catalog_is_admin_session_active();
 
 catalog_track_visit('rdv');
 
+$rdvStructuredData = [
+    '@context' => 'https://schema.org',
+    '@graph' => [
+        [
+            '@type' => 'WebPage',
+            '@id' => 'https://www.clinikauto.fr/rdv/rdv.php#webpage',
+            'url' => 'https://www.clinikauto.fr/rdv/rdv.php',
+            'name' => 'Prendre rendez-vous | Clinik Auto',
+            'description' => 'Réservation de rendez-vous pour entretien, diagnostic, révision ou retrait chez Clinik Auto.',
+            'about' => [
+                '@id' => 'https://www.clinikauto.fr/#garage'
+            ]
+        ],
+        [
+            '@type' => 'BreadcrumbList',
+            '@id' => 'https://www.clinikauto.fr/rdv/rdv.php#breadcrumb',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Accueil', 'item' => 'https://www.clinikauto.fr/'],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Rendez-vous', 'item' => 'https://www.clinikauto.fr/rdv/rdv.php']
+            ]
+        ],
+        [
+            '@type' => 'Service',
+            'name' => 'Prise de rendez-vous garage',
+            'serviceType' => 'Rendez-vous atelier automobile',
+            'provider' => [
+                '@id' => 'https://www.clinikauto.fr/#garage'
+            ],
+            'availableChannel' => [
+                '@type' => 'ServiceChannel',
+                'serviceUrl' => 'https://www.clinikauto.fr/rdv/rdv.php'
+            ],
+            'areaServed' => 'Haute-Savoie'
+        ]
+    ]
+];
+
 date_default_timezone_set("Europe/Paris");
 
 function get_easter_date(int $year): DateTimeImmutable
@@ -197,19 +234,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } elseif (!filter_var($form["email"], FILTER_VALIDATE_EMAIL)) {
         $error_message = "L'adresse email saisie n'est pas valide.";
     } elseif ((function_exists('mb_strlen') ? mb_strlen($form["objet"]) : strlen($form["objet"])) > 500) {
-        $error_message = "L'objet de votre demande ne doit pas depasser 500 caracteres.";
+            $error_message = "L'objet de votre demande ne doit pas dépasser 500 caractères.";
     } else {
         $selected_day = DateTimeImmutable::createFromFormat("Y-m-d", $form["date"]);
-        if (!$selected_day) {
-            $error_message = "La date selectionnee est invalide.";
-        } elseif ($form["date"] < $tomorrow) {
-            $error_message = "La date de rendez-vous doit etre au minimum le lendemain.";
-        } elseif (is_closed_day($form["date"])) {
-            $error_message = "Le garage est ferme a cette date (dimanche ou jour ferie). Choisissez une autre date.";
+            if (!$selected_day) {
+                $error_message = "La date sélectionnée est invalide.";
+            } elseif ($form["date"] < $tomorrow) {
+                $error_message = "La date de rendez-vous doit être au minimum le lendemain.";
+            } elseif (is_closed_day($form["date"])) {
+                $error_message = "Le garage est fermé à cette date (dimanche ou jour férié). Choisissez une autre date.";
         } else {
             $allowed_slots = get_slots_for_date($form["date"]);
             if (!in_array($form["heure"], $allowed_slots, true)) {
-                $error_message = "Le creneau choisi ne correspond pas aux horaires d'ouverture.";
+                    $error_message = "Le créneau choisi ne correspond pas aux horaires d'ouverture.";
             }
         }
     }
@@ -262,7 +299,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         if ($form['customer_type'] === 'professional') {
             $identityMessage = $nom . ' (contact: ' . $prenom . ')';
         }
-        $message = "Merci $identityMessage, votre demande de rendez-vous a bien été prise en compte. Nous vous confirmons votre créneau dans les 24h.";
+        $message = "Merci $identityMessage, votre demande de rendez-vous a bien été prise en compte. Nous vous confirmons votre créneau dans les meilleurs délais.";
         $form = array_fill_keys(array_keys($form), "");
         $form['customer_type'] = 'individual';
     }
@@ -278,8 +315,8 @@ $all_holidays = array_values(array_unique(array_merge($holidays_this_year, $holi
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prendre Rendez-vous | Clinik Auto – Garage Automobile Scionzier (74)</title>
-    <meta name="description" content="Prenez rendez-vous en ligne au garage Clinik Auto à Scionzier (74950). Entretien, révision, réparation – disponibilités en temps réel. Réponse rapide garantie.">
+    <title>Rendez-vous Garage Scionzier (74950) | Révision & Entretien en Ligne | Clinik Auto</title>
+    <meta name="description" content="Réservez votre rendez-vous en ligne chez Clinik Auto, garage à Scionzier (74950). Révision, entretien, réparation – créneaux disponibles en temps réel. Proche Cluses & Bonneville.">
     <meta name="keywords" content="rendez-vous garage Scionzier, prise RDV mécanicien 74, réserver révision voiture Haute-Savoie, rendez-vous entretien auto 74950, garage Cluses RDV en ligne">
     <meta name="robots" content="index, follow">
     <meta name="geo.region" content="FR-74">
@@ -300,18 +337,11 @@ $all_holidays = array_values(array_unique(array_merge($holidays_this_year, $holi
     <script src="../assets/postal-city.js" defer></script>
     <script src="../assets/customer-type.js" defer></script>
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.clinikauto.fr/"},
-        {"@type": "ListItem", "position": 2, "name": "Rendez-vous", "item": "https://www.clinikauto.fr/rdv/rdv.php"}
-      ]
-    }
+        <?php echo json_encode($rdvStructuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
     </script>
     <?php echo catalog_get_google_analytics_script(); ?>
 </head>
-<body>
+<body class="public-page">
     <header>
         <div class="site-brand">
             <a class="site-brand-link" href="../index.html" aria-label="Clinik Auto accueil">
@@ -330,8 +360,8 @@ $all_holidays = array_values(array_unique(array_merge($holidays_this_year, $holi
         </nav>
     </header>
     <main>
-        <h2>Formulaire de rendez-vous</h2>
-        <p>Remplissez le formulaire ci-dessous, nous vous confirmons votre créneau dans les 24h.</p>
+        <h1>Prendre rendez-vous au garage</h1>
+        <p>Remplissez le formulaire ci-dessous, nous vous confirmons votre créneau dans les meilleurs délais.</p>
         <?php if ($prefill_notice !== '') { echo "<p class='success-message'>" . htmlspecialchars($prefill_notice) . "</p>"; } ?>
         <?php if ($message)       { echo "<p class='success-message'>" . htmlspecialchars($message) . "</p>"; } ?>
         <?php if ($error_message) { echo "<p class='error-message'>"   . htmlspecialchars($error_message) . "</p>"; } ?>
@@ -388,6 +418,7 @@ $all_holidays = array_values(array_unique(array_merge($holidays_this_year, $holi
                 <textarea name="objet" rows="4" placeholder="Décrivez l'objet de votre demande (500 caractères max)" maxlength="500" required><?php echo ev($form['objet']); ?></textarea>
             </label>
             <button type="submit">Confirmer mon rendez-vous →</button>
+            <p class="form-note">La demande est sans engagement: nous validons votre creneau avec vous avant confirmation finale.</p>
             </div>
         </form>
         <script>
@@ -455,6 +486,7 @@ $all_holidays = array_values(array_unique(array_merge($holidays_this_year, $holi
             refillHours();
         })();
         </script>
+        <script src="../assets/conversion-tracking.js" defer></script>
     </main>
     <footer>
         <address>

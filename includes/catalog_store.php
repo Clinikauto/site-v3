@@ -343,7 +343,7 @@ function catalog_bank_accounts_default()
             'iban' => '',
             'bic' => '',
             'bank_name' => '',
-            'note' => 'Virement instantane uniquement. Merci d\'indiquer la reference de votre commande.',
+            'note' => 'Virement instantané uniquement. Merci d\'indiquer la référence de votre commande.',
             'is_active' => true,
             'is_default' => true,
             'created_at' => date('c'),
@@ -646,6 +646,177 @@ function catalog_bank_account_find_by_id($id)
     return null;
 }
 
+function catalog_devis_config_file_path()
+{
+    return dirname(__DIR__) . '/data/devis_config.json';
+}
+
+function catalog_devis_config_default()
+{
+    return [
+        'categories' => [
+            [
+                'id' => 'entretien-revision',
+                'title' => 'Entretien & Revision',
+                'icon' => '🔄',
+                'hidden_on_devis' => false,
+                'options' => [
+                    ['label' => 'Vidange moteur', 'unavailable_on_devis' => false, 'icon' => '🛢️'],
+                    ['label' => 'Changement filtre a huile', 'unavailable_on_devis' => false, 'icon' => '🧴'],
+                    ['label' => 'Controle freins', 'unavailable_on_devis' => false, 'icon' => '🛑'],
+                    ['label' => 'Controle batterie', 'unavailable_on_devis' => false, 'icon' => '🔋']
+                ]
+            ],
+            [
+                'id' => 'reparation-diagnostic',
+                'title' => 'Reparation & Diagnostic',
+                'icon' => '🔩',
+                'hidden_on_devis' => false,
+                'options' => [
+                    ['label' => 'Diagnostic electronique', 'unavailable_on_devis' => false, 'icon' => '🧪'],
+                    ['label' => 'Reparation embrayage', 'unavailable_on_devis' => false, 'icon' => '⚙️'],
+                    ['label' => 'Reparation suspension', 'unavailable_on_devis' => false, 'icon' => '🔩'],
+                    ['label' => 'Reparation climatisation', 'unavailable_on_devis' => false, 'icon' => '❄️']
+                ]
+            ],
+            [
+                'id' => 'services-auto',
+                'title' => 'Nos services auto',
+                'icon' => '⭐',
+                'hidden_on_devis' => false,
+                'options' => [
+                    ['label' => 'Recherche vehicule d\'occasion', 'unavailable_on_devis' => false, 'icon' => '🚗'],
+                    ['label' => 'Controle avant achat', 'unavailable_on_devis' => false, 'icon' => '🔎'],
+                    ['label' => 'Enlevement VHU', 'unavailable_on_devis' => false, 'icon' => '🚚'],
+                    ['label' => 'Controle Technique', 'unavailable_on_devis' => false, 'icon' => '✅'],
+                    ['label' => 'Pre-Controle Technique', 'unavailable_on_devis' => false, 'icon' => '☑️'],
+                    ['label' => 'Remorquage', 'unavailable_on_devis' => false, 'icon' => '🪝']
+                ]
+            ]
+        ]
+    ];
+}
+
+function catalog_devis_config_normalize($config)
+{
+    $defaults = catalog_devis_config_default();
+    $categories = [];
+    $seenIds = [];
+
+    foreach ((array) ($config['categories'] ?? []) as $category) {
+        if (!is_array($category)) {
+            continue;
+        }
+
+        $title = trim((string) ($category['title'] ?? ''));
+        if ($title === '') {
+            continue;
+        }
+
+        $id = trim((string) ($category['id'] ?? ''));
+        $id = preg_replace('/[^a-z0-9_-]/i', '-', strtolower($id));
+        $id = trim((string) preg_replace('/-+/', '-', (string) $id), '-');
+        if ($id === '') {
+            $id = 'cat-' . substr(sha1($title . '|' . microtime(true) . '|' . mt_rand()), 0, 10);
+        }
+        if (isset($seenIds[$id])) {
+            $id = $id . '-' . substr(sha1((string) mt_rand()), 0, 4);
+        }
+
+        $icon = trim((string) ($category['icon'] ?? ''));
+        if ($icon === '') {
+            $icon = '🛠️';
+        }
+
+        $options = [];
+        $seenOptions = [];
+        foreach ((array) ($category['options'] ?? []) as $option) {
+            // Support both legacy string format and new object format
+            if (is_array($option)) {
+                $label = trim((string) ($option['label'] ?? ''));
+                $unavailable = !empty($option['unavailable_on_devis']);
+                $icon = trim((string) ($option['icon'] ?? ''));
+            } else {
+                $label = trim((string) $option);
+                $unavailable = false;
+                $icon = '';
+            }
+            
+            if ($label === '') {
+                continue;
+            }
+
+            $normalizedLabel = strtolower($label);
+            if (isset($seenOptions[$normalizedLabel])) {
+                continue;
+            }
+
+            $seenOptions[$normalizedLabel] = true;
+            $options[] = [
+                'label' => $label,
+                'unavailable_on_devis' => $unavailable,
+                'icon' => $icon
+            ];
+        }
+
+        if (empty($options)) {
+            continue;
+        }
+
+        $seenIds[$id] = true;
+        $categories[] = [
+            'id' => $id,
+            'title' => $title,
+            'icon' => $icon,
+            'hidden_on_devis' => !empty($category['hidden_on_devis']),
+            'options' => $options
+        ];
+    }
+
+    if (empty($categories)) {
+        return $defaults;
+    }
+
+    return ['categories' => $categories];
+}
+
+function catalog_devis_config_load()
+{
+    $path = catalog_devis_config_file_path();
+    if (!file_exists($path)) {
+        return catalog_devis_config_default();
+    }
+
+    $raw = @file_get_contents($path);
+    if ($raw === false || trim($raw) === '') {
+        return catalog_devis_config_default();
+    }
+
+    $decoded = json_decode($raw, true);
+    if (!is_array($decoded)) {
+        return catalog_devis_config_default();
+    }
+
+    return catalog_devis_config_normalize($decoded);
+}
+
+function catalog_devis_config_save($config)
+{
+    $path = catalog_devis_config_file_path();
+    $dir = dirname($path);
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0775, true);
+    }
+
+    $normalized = catalog_devis_config_normalize(is_array($config) ? $config : []);
+    $payload = json_encode($normalized, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if ($payload === false) {
+        return false;
+    }
+
+    return @file_put_contents($path, $payload) !== false;
+}
+
 function catalog_db_has_column($connection, $table, $column)
 {
     $table = $connection->real_escape_string($table);
@@ -814,28 +985,84 @@ function catalog_postal_reference_ensure_loaded($connection)
     }
 }
 
-function catalog_lookup_cities_by_postal_code($postalCode, $limit = 20)
+function catalog_lookup_cities_by_postal_code_csv($postalCode, $limit = 20)
 {
-    if (!catalog_using_database()) {
-        return [];
-    }
-
-    $connection = catalog_db_connection();
-    if (!$connection) {
-        return [];
-    }
+    static $postalIndex = null;
 
     $postalCode = preg_replace('/\D+/', '', (string) $postalCode);
     if ($postalCode === '') {
         return [];
     }
 
+    if ($postalIndex === null) {
+        $postalIndex = [];
+        $sourcePath = catalog_postal_reference_source_path();
+        if ($sourcePath !== '' && is_file($sourcePath)) {
+            $handle = @fopen($sourcePath, 'rb');
+            if ($handle) {
+                fgetcsv($handle, 0, ';');
+                while (($rowData = fgetcsv($handle, 0, ';')) !== false) {
+                    if (!is_array($rowData) || count($rowData) < 4) {
+                        continue;
+                    }
+
+                    $rowPostalCode = preg_replace('/\D+/', '', (string) ($rowData[2] ?? ''));
+                    if ($rowPostalCode === '') {
+                        continue;
+                    }
+
+                    $communeName = trim(catalog_to_utf8((string) ($rowData[1] ?? '')));
+                    $line5 = trim(catalog_to_utf8((string) ($rowData[4] ?? '')));
+                    $cityName = catalog_postal_city_display_name($communeName, $line5);
+                    if ($cityName === '') {
+                        continue;
+                    }
+
+                    if (!isset($postalIndex[$rowPostalCode])) {
+                        $postalIndex[$rowPostalCode] = [];
+                    }
+                    $postalIndex[$rowPostalCode][$cityName] = true;
+                }
+                fclose($handle);
+            }
+        }
+    }
+
+    if (!isset($postalIndex[$postalCode])) {
+        return [];
+    }
+
+    $cities = array_keys($postalIndex[$postalCode]);
+    sort($cities, SORT_NATURAL | SORT_FLAG_CASE);
+    return array_slice($cities, 0, max(1, min(50, (int) $limit)));
+}
+
+function catalog_lookup_cities_by_postal_code($postalCode, $limit = 20)
+{
+    $postalCode = preg_replace('/\D+/', '', (string) $postalCode);
+    if ($postalCode === '') {
+        return [];
+    }
+
     $limit = max(1, min(50, (int) $limit));
+
+    if (!catalog_using_database()) {
+        return catalog_lookup_cities_by_postal_code_csv($postalCode, $limit);
+    }
+
+    $connection = catalog_db_connection();
+    if (!$connection) {
+        return catalog_lookup_cities_by_postal_code_csv($postalCode, $limit);
+    }
+
+    // Ensure postal reference table is populated from CSV before querying.
+    catalog_postal_reference_ensure_loaded($connection);
+
     $statement = $connection->prepare(
         'SELECT city_name FROM postal_code_reference WHERE postal_code = ? GROUP BY city_name ORDER BY city_name ASC LIMIT ' . $limit
     );
     if (!$statement) {
-        return [];
+        return catalog_lookup_cities_by_postal_code_csv($postalCode, $limit);
     }
 
     $statement->bind_param('s', $postalCode);
@@ -844,9 +1071,15 @@ function catalog_lookup_cities_by_postal_code($postalCode, $limit = 20)
     $rows = $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     $statement->close();
 
-    return array_values(array_filter(array_map(function ($row) {
+    $cities = array_values(array_filter(array_map(function ($row) {
         return trim((string) ($row['city_name'] ?? ''));
     }, $rows)));
+
+    if (!empty($cities)) {
+        return $cities;
+    }
+
+    return catalog_lookup_cities_by_postal_code_csv($postalCode, $limit);
 }
 
 function catalog_db_apply_migrations($connection)
@@ -1252,11 +1485,11 @@ function catalog_default_data()
                 'id' => 3,
                 'type' => 'part',
                 'title' => 'Optique avant gauche Peugeot 208',
-                'subtitle' => 'Reference 9812345677 - piece d\'occasion controlee',
+                'subtitle' => 'Référence 9812345677 - pièce d\'occasion contrôlée',
                 'price' => 180,
-                'short_description' => 'Optique complet, fixations controlees, pret a monter.',
-                'description' => "Optique avant gauche d'occasion controle en atelier. Compatible avec Peugeot 208 phase 2. Etat propre, vitrage sain, connectique verifiee.\n\nReservation possible avec acompte de 30 % par virement instantane.",
-                'specs' => "Famille : Eclairage\nCompatibilite : Peugeot 208 phase 2\nEtat : Tres bon etat\nReference : 9812345677\nGarantie : 3 mois",
+                'short_description' => 'Optique complète, fixations contrôlées, prête à monter.',
+                'description' => "Optique avant gauche d'occasion contrôlée en atelier. Compatible avec Peugeot 208 phase 2. État propre, vitrage sain, connectique vérifiée.\n\nRéservation possible avec acompte de 30 % par virement instantané.",
+                'specs' => "Famille : Eclairage\nCompatibilité : Peugeot 208 phase 2\nÉtat : Très bon état\nRéférence : 9812345677\nGarantie : 3 mois",
                 'status' => 'available',
                 'payment_confirmed' => false,
                 'images' => [
@@ -1274,11 +1507,11 @@ function catalog_default_data()
                 'id' => 4,
                 'type' => 'part',
                 'title' => 'Jante aluminium Renault Clio',
-                'subtitle' => '16 pouces - finition argent - vendue a l\'unite',
+                'subtitle' => '16 pouces - finition argent - vendue à l\'unité',
                 'price' => 95,
-                'short_description' => 'Jante d\'occasion controlee, sans fissure ni voile detecte.',
-                'description' => "Jante aluminium d'occasion controlee. Equilibrage possible a l'atelier avant retrait.\n\nPour reserver la piece, un acompte de 30 % est demande. La piece passe en indisponible des validation de cet acompte.",
-                'specs' => "Famille : Roue\nCompatibilite : Renault Clio IV\nDiametre : 16 pouces\nEntraxe : 4x100\nEtat : Bon etat",
+                'short_description' => 'Jante d\'occasion contrôlée, sans fissure ni voile détecté.',
+                'description' => "Jante aluminium d'occasion contrôlée. Équilibrage possible à l'atelier avant retrait.\n\nPour réserver la pièce, un acompte de 30 % est demandé. La pièce passe en indisponible dès validation de cet acompte.",
+                'specs' => "Famille : Roue\nCompatibilité : Renault Clio IV\nDiamètre : 16 pouces\nEntraxe : 4x100\nÉtat : Bon état",
                 'status' => 'available',
                 'payment_confirmed' => false,
                 'images' => [
@@ -1524,6 +1757,30 @@ function catalog_send_email($to, $subject, $body, $replyTo = '')
     $to = trim((string) $to);
     if ($to === '' || !filter_var($to, FILTER_VALIDATE_EMAIL)) {
         return false;
+    }
+
+    // En mode développement local, capturer l'email dans un fichier JSON au lieu de l'envoyer
+    if (defined('CATALOG_IS_LOCAL_RUNTIME') && CATALOG_IS_LOCAL_RUNTIME) {
+        $emailLogDir = dirname(__DIR__) . '/email-logs';
+        if (!is_dir($emailLogDir)) {
+            @mkdir($emailLogDir, 0777, true);
+        }
+
+        $emailRecord = [
+            'id' => uniqid('email-', true),
+            'from' => defined('EMAIL_EXPEDITEUR') ? EMAIL_EXPEDITEUR : 'no-reply@localhost',
+            'to' => [$to],
+            'reply_to' => $replyTo ?: null,
+            'subject' => $subject,
+            'body' => $body,
+            'timestamp' => time(),
+            'type' => 'dev_capture'
+        ];
+
+        $logFile = $emailLogDir . '/' . $emailRecord['id'] . '.json';
+        @file_put_contents($logFile, json_encode($emailRecord, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        return true; // Succès (capturé localement)
     }
 
     if (defined('COMPOSER_AUTOLOAD_PATH') && file_exists(COMPOSER_AUTOLOAD_PATH)) {
@@ -2302,7 +2559,7 @@ function catalog_delete_rdv($id)
                 return [false, 'Suppression Google impossible: ' . $error];
             }
             if ($httpCode === 404) {
-                $googleDeleteNote = ' (evenement Google deja absent)';
+                $googleDeleteNote = ' (événement Google déjà absent)';
             }
         } else {
             return [false, 'Suppression Google impossible: ' . (string) $tokenOrError];
@@ -3374,12 +3631,12 @@ function catalog_notify_part_transfer_confirmed($part, $request)
         return false;
     }
 
-    $subject = '[Clinik Auto] Virement recu - reservation confirmee';
+    $subject = '[Clinik Auto] Virement reçu - réservation confirmée';
     $body =
         "Bonjour " . ($request['firstname'] ?? '') . " " . ($request['lastname'] ?? '') . ",\n\n" .
         "Nous confirmons la reception de votre virement pour la piece suivante :\n" .
         ($part['title'] ?? 'Pièce') . "\n\n" .
-        "Votre reservation est maintenant confirmee chez Clinik Auto.\n" .
+        "Votre réservation est maintenant confirmée chez Clinik Auto.\n" .
         "Nous vous recontacterons pour la suite de la remise.\n\n" .
         "Cordialement,\n" . (defined('GARAGE_NOM') ? GARAGE_NOM : 'Clinik Auto');
 
@@ -3398,7 +3655,7 @@ function catalog_notify_part_transfer_rejected($part, $request, $appointmentCanc
         "Nous n'avons pas retrouve le virement annonce pour la piece suivante :\n" .
         ($part['title'] ?? 'Pièce') . "\n\n" .
         ($appointmentCancelled ? "Le rendez-vous associe a cette demande a ete annule.\n\n" : '') .
-        "La reservation prioritaire est liberee. Vous pouvez nous recontacter si le virement arrive avec retard.\n\n" .
+        "La réservation prioritaire est libérée. Vous pouvez nous recontacter si le virement arrive avec retard.\n\n" .
         "Cordialement,\n" . (defined('GARAGE_NOM') ? GARAGE_NOM : 'Clinik Auto');
 
     return catalog_send_email($request['email'], $subject, $body);
@@ -3410,13 +3667,13 @@ function catalog_notify_part_transfer_expired($part, $request, $appointmentCance
         return false;
     }
 
-    $subject = '[Clinik Auto] Reservation annulee - delai depasse';
+    $subject = '[Clinik Auto] Réservation annulée - délai dépassé';
     $body =
         "Bonjour " . ($request['firstname'] ?? '') . " " . ($request['lastname'] ?? '') . ",\n\n" .
         "Le delai de verification de votre virement est arrive a expiration pour la piece suivante :\n" .
         ($part['title'] ?? 'Pièce') . "\n\n" .
         ($appointmentCancelled ? "Le rendez-vous associe a cette demande a egalement ete annule.\n\n" : '') .
-        "La reservation est annulee et la priorite passe au client suivant s'il existe.\n\n" .
+        "La réservation est annulée et la priorité passe au client suivant s'il existe.\n\n" .
         "Cordialement,\n" . (defined('GARAGE_NOM') ? GARAGE_NOM : 'Clinik Auto');
 
     return catalog_send_email($request['email'], $subject, $body);
@@ -3478,7 +3735,7 @@ function catalog_part_process_current_request_resolution($id, $resolution)
         $updateCurrent->execute();
         $updateCurrent->close();
 
-        $cancelledAppointments = catalog_cancel_linked_rdv('part_reservation', (string) $requestId, $resolution === 'expired' ? 'Delai de verification depasse' : 'Virement non retrouve');
+        $cancelledAppointments = catalog_cancel_linked_rdv('part_reservation', (string) $requestId, $resolution === 'expired' ? 'Délai de vérification dépassé' : 'Virement non retrouvé');
 
         if ($resolution === 'expired') {
             catalog_notify_part_transfer_expired($part, $current, $cancelledAppointments > 0);
@@ -3574,7 +3831,7 @@ function catalog_part_process_current_request_resolution($id, $resolution)
         $item['part_requests'][$currentIndex]['transfer_verification_status'] = $resolution === 'expired' ? 'expired' : 'rejected';
         $item['part_requests'][$currentIndex]['transfer_verified_at'] = date('c');
 
-        $cancelledAppointments = catalog_cancel_linked_rdv('part_reservation', (string) ($currentRequest['id'] ?? ''), $resolution === 'expired' ? 'Delai de verification depasse' : 'Virement non retrouve');
+        $cancelledAppointments = catalog_cancel_linked_rdv('part_reservation', (string) ($currentRequest['id'] ?? ''), $resolution === 'expired' ? 'Délai de vérification dépassé' : 'Virement non retrouvé');
 
         if ($resolution === 'expired') {
             catalog_notify_part_transfer_expired($item, $currentRequest, $cancelledAppointments > 0);
@@ -4370,7 +4627,7 @@ function catalog_validate_payload($payload)
         $errors[] = 'Le bloc de renseignements est obligatoire.';
     }
     if ($item['price'] === '' || !is_numeric($item['price'])) {
-        $errors[] = 'Le prix doit etre renseigne en numerique.';
+        $errors[] = 'Le prix doit être renseigné en numérique.';
     }
 
     $item['price'] = is_numeric($item['price']) ? round((float) $item['price'], 2) : 0.0;
@@ -4538,8 +4795,8 @@ function catalog_build_contact_link($item)
     if (($item['type'] ?? '') === 'part') {
         $deposit = number_format(catalog_reservation_amount($item['price'] ?? 0), 2, ',', ' ');
         $query = $base_query + [
-            'sujet' => 'Reservation piece d\'occasion - ' . $title,
-            'message' => "Bonjour, je souhaite reserver la piece suivante : " . $title . " (" . $price . " EUR). Je suis informe qu'un acompte de 30 % soit " . $deposit . " EUR est demande par virement instantane. Merci de me recontacter pour finaliser la reservation.",
+            'sujet' => 'Réservation pièce d\'occasion - ' . $title,
+            'message' => "Bonjour, je souhaite réserver la pièce suivante : " . $title . " (" . $price . " EUR). Je suis informé qu'un acompte de 30 % soit " . $deposit . " EUR est demandé par virement instantané. Merci de me recontacter pour finaliser la réservation.",
             'acompte_montant' => (string) catalog_reservation_amount($item['price'] ?? 0)
         ];
 
@@ -4547,8 +4804,8 @@ function catalog_build_contact_link($item)
     }
 
     $query = $base_query + [
-        'sujet' => 'Reservation visite vehicule - ' . $title,
-        'message' => "Bonjour, je souhaite reserver une visite pour le vehicule suivant : " . $title . " (" . $price . " EUR). Merci de me proposer un rendez-vous."
+        'sujet' => 'Réservation visite véhicule - ' . $title,
+        'message' => "Bonjour, je souhaite réserver une visite pour le véhicule suivant : " . $title . " (" . $price . " EUR). Merci de me proposer un rendez-vous."
     ];
 
     return '../contact/contact.php?' . http_build_query($query);
@@ -4556,7 +4813,7 @@ function catalog_build_contact_link($item)
 
 function catalog_type_label($type)
 {
-    return $type === 'part' ? 'Piece d\'occasion' : 'Vehicule d\'occasion';
+    return $type === 'part' ? 'Pièce d\'occasion' : 'Véhicule d\'occasion';
 }
 
 function catalog_escape($value)
@@ -5046,7 +5303,7 @@ function catalog_db_upsert_item($item, $files, $remove_image_ids, $errors)
             $statement->bind_param($types, $annonceId, ...$ids);
             if (!$statement->execute()) {
                 $statement->close();
-                return [false, ['Impossible de supprimer les images selectionnees.'], $item];
+                return [false, ['Impossible de supprimer les images sélectionnées.'], $item];
             }
             $statement->close();
         }
@@ -5062,7 +5319,7 @@ function catalog_db_upsert_item($item, $files, $remove_image_ids, $errors)
                 $statement->bind_param('isssi', $annonceId, $image['name'], $image['mime'], $blob, $order);
                 if (!$statement->execute()) {
                     $statement->close();
-                    return [false, ['Une image n\'a pas pu etre enregistree en base.'], $item];
+                    return [false, ['Une image n\'a pas pu être enregistrée en base.'], $item];
                 }
             }
             $statement->close();

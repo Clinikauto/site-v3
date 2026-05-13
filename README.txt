@@ -14,15 +14,15 @@ Clinik Auto - Guide d'installation et d'utilisation
 └── contact/
     └── contact.php            # Page de contact
 
-🚀 DÉPLOIEMENT SUR WEBATOR
-==========================
+🚀 DÉPLOIEMENT SUR O2SWITCH
+===========================
 
 1. Préparation locale :
    - Tous les fichiers sont prêts dans le dossier "clinikauto"
    - Tester localement : ouvrir index.html dans un navigateur
 
-2. Upload sur Webator :
-   - Se connecter à Webator (cPanel ou Webator Manager)
+2. Upload sur o2switch :
+  - Se connecter à o2switch (cPanel)
    - Aller à "Gestionnaire de fichiers" ou "FTP"
    - Uploader TOUS les fichiers du dossier "clinikauto" vers la racine (public_html ou www)
    - Structure finale attendue :
@@ -33,7 +33,7 @@ Clinik Auto - Guide d'installation et d'utilisation
      * /public_html/contact/contact.php
 
 3. Configuration base de données (optionnel mais recommandé) :
-   - Créer une base de données MySQL dans Webator
+  - Créer une base de données MySQL dans o2switch
    - Pour enregistrer les rendez-vous, modifier rdv/rdv.php :
      * Ajouter les identifiants de connexion BDD
      * Créer une table "rendez_vous" avec les colonnes : id, nom, email, date, service
@@ -108,7 +108,7 @@ Ajouter des véhicules dans catalogue.php :
 
 ✅ CHECKLIST AVANT LANCEMENT
 ============================
-- [ ] Tous les fichiers uploadés sur Webator
+- [ ] Tous les fichiers uploadés sur o2switch
 - [ ] Tester tous les liens de navigation
 - [ ] Tester le formulaire de contact
 - [ ] Tester le formulaire de rendez-vous
@@ -122,6 +122,6 @@ Ajouter des véhicules dans catalogue.php :
 📞 SUPPORT
 ==========
 Pour toute question ou modification, consultez :
-- Documentation Webator
+- Documentation o2switch
 - Documentation PHP
 - Support de votre prestataire d'hébergement

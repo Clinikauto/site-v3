@@ -10,6 +10,53 @@ $showAdminReturn = catalog_is_admin_session_active();
 
 catalog_track_visit('contact');
 
+$contactStructuredData = [
+    '@context' => 'https://schema.org',
+    '@graph' => [
+        [
+            '@type' => 'ContactPage',
+            '@id' => 'https://www.clinikauto.fr/contact/contact.php#webpage',
+            'url' => 'https://www.clinikauto.fr/contact/contact.php',
+            'name' => 'Contact Clinik Auto',
+            'description' => 'Coordonnées, formulaire de contact et demande de devis Clinik Auto à Scionzier.',
+            'about' => [
+                '@id' => 'https://www.clinikauto.fr/#garage'
+            ]
+        ],
+        [
+            '@type' => 'BreadcrumbList',
+            '@id' => 'https://www.clinikauto.fr/contact/contact.php#breadcrumb',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Accueil', 'item' => 'https://www.clinikauto.fr/'],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Contact', 'item' => 'https://www.clinikauto.fr/contact/contact.php']
+            ]
+        ],
+        [
+            '@type' => 'AutoRepair',
+            '@id' => 'https://www.clinikauto.fr/#garage',
+            'name' => 'Clinik Auto',
+            'url' => 'https://www.clinikauto.fr/',
+            'telephone' => '+33620185627',
+            'email' => 'clinikauto74@gmail.com',
+            'address' => [
+                '@type' => 'PostalAddress',
+                'streetAddress' => '118 Clos des Teppes',
+                'postalCode' => '74950',
+                'addressLocality' => 'Scionzier',
+                'addressCountry' => 'FR'
+            ],
+            'contactPoint' => [
+                '@type' => 'ContactPoint',
+                'contactType' => 'customer service',
+                'telephone' => '+33620185627',
+                'email' => 'clinikauto74@gmail.com',
+                'areaServed' => 'FR',
+                'availableLanguage' => ['fr']
+            ]
+        ]
+    ]
+];
+
 if (defined("COMPOSER_AUTOLOAD_PATH") && file_exists(COMPOSER_AUTOLOAD_PATH)) {
     require_once COMPOSER_AUTOLOAD_PATH;
 }
@@ -67,14 +114,14 @@ function contact_request_context($form_data)
     $action = trim((string) ($form_data["contact_action"] ?? ""));
 
     if ($action === "vehicle_visit") {
-        return "Reservation visite vehicule";
+        return "Réservation visite véhicule";
     }
 
     if ($action === "part_reservation") {
         if (($form_data["acompte_confirme"] ?? "") === "1") {
-            return "Reservation piece - acompte confirme";
+            return "Réservation pièce - acompte confirmé";
         }
-        return "Reservation piece d'occasion";
+        return "Réservation pièce d'occasion";
     }
 
     if (!empty($form_data["prestations"] ?? "")) {
@@ -462,7 +509,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             ? ($form_data["annonce_title"] . ($form_data["annonce_price"] !== "" ? " (" . $form_data["annonce_price"] . " EUR)" : ""))
             : "N/A";
         $email_body =
-            "Nouvelle demande recu via formulaire contact\n\n" .
+            "Nouvelle demande reçue via formulaire contact\n\n" .
             "Type de demande automatique: " . $request_type . "\n" .
             "Type client: " . ($form_data["customer_type"] === 'professional' ? 'Professionnel' : 'Particulier') . "\n" .
             contact_identity_label($form_data["customer_type"], "nom") . ": " . $form_data["nom"] . "\n" .
@@ -471,19 +518,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "Code postal: " . $form_data["code_postal"] . "\n" .
             "Ville: " . $form_data["ville"] . "\n" .
             "Email: " . $form_data["email"] . "\n" .
-            "Telephone: " . $form_data["telephone"] . "\n" .
+            "Téléphone: " . $form_data["telephone"] . "\n" .
             "Immatriculation: " . $form_data["immatriculation"] . "\n" .
-            "Annonce liee: " . $annonce_resume . "\n" .
+            "Annonce liée: " . $annonce_resume . "\n" .
             "Type annonce: " . $form_data["annonce_type"] . "\n" .
-            "Acompte confirme: " . (($form_data["acompte_confirme"] === "1") ? "Oui" : "Non") . "\n" .
+            "Acompte confirmé: " . (($form_data["acompte_confirme"] === "1") ? "Oui" : "Non") . "\n" .
             "Acompte attendu (30%): " . ($form_data["acompte_montant"] !== "" ? $form_data["acompte_montant"] . " EUR" : "N/A") . "\n" .
-            "Articles pieces selectionnes: " . ($form_data["selected_parts_count"] !== "" ? $form_data["selected_parts_count"] : "N/A") . "\n" .
-            "IDs pieces selectionnees: " . ($form_data["selected_parts_ids"] !== "" ? $form_data["selected_parts_ids"] : "N/A") . "\n" .
-            "Titres pieces selectionnees: " . ($form_data["selected_parts_titles"] !== "" ? $form_data["selected_parts_titles"] : "N/A") . "\n" .
-            "Vehicules selectionnes (nb): " . ($form_data["selected_vehicles_count"] !== "" ? $form_data["selected_vehicles_count"] : "N/A") . "\n" .
-            "IDs vehicules selectionnes: " . ($form_data["selected_vehicles_ids"] !== "" ? $form_data["selected_vehicles_ids"] : "N/A") . "\n" .
-            "Titres vehicules selectionnes: " . ($form_data["selected_vehicles_titles"] !== "" ? $form_data["selected_vehicles_titles"] : "N/A") . "\n" .
-            "Date d'essai souhaitee: " . ($form_data["date_essai"] !== "" ? $form_data["date_essai"] : "N/A") . "\n" .
+            "Articles pièces sélectionnés: " . ($form_data["selected_parts_count"] !== "" ? $form_data["selected_parts_count"] : "N/A") . "\n" .
+            "IDs pièces sélectionnées: " . ($form_data["selected_parts_ids"] !== "" ? $form_data["selected_parts_ids"] : "N/A") . "\n" .
+            "Titres pièces sélectionnées: " . ($form_data["selected_parts_titles"] !== "" ? $form_data["selected_parts_titles"] : "N/A") . "\n" .
+            "Véhicules sélectionnés (nb): " . ($form_data["selected_vehicles_count"] !== "" ? $form_data["selected_vehicles_count"] : "N/A") . "\n" .
+            "IDs véhicules sélectionnés: " . ($form_data["selected_vehicles_ids"] !== "" ? $form_data["selected_vehicles_ids"] : "N/A") . "\n" .
+            "Titres véhicules sélectionnés: " . ($form_data["selected_vehicles_titles"] !== "" ? $form_data["selected_vehicles_titles"] : "N/A") . "\n" .
+            "Date d'essai souhaitée: " . ($form_data["date_essai"] !== "" ? $form_data["date_essai"] : "N/A") . "\n" .
             "Sujet: " . $form_data["sujet"] . "\n" .
             "Prestations: " . $form_data["prestations"] . "\n\n" .
             "Message:\n" . $form_data["message"] . "\n";
@@ -535,7 +582,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     'linked_request_id' => $part_request_id,
                     'linked_annonce_id' => (string) ((int) ($form_data['annonce_id'] ?? 0)),
                     'linked_title' => (string) ($form_data['annonce_title'] ?? ''),
-                    'objet' => 'Retrait / reservation piece - ' . (string) ($form_data['annonce_title'] ?? 'Piece')
+                    'objet' => 'Retrait / réservation pièce - ' . (string) ($form_data['annonce_title'] ?? 'Pièce')
                 ];
             }
             if ($form_data["contact_action"] === "vehicle_visit" && $vehicle_request_saved && $vehicle_request_active && $vehicle_request_id !== '') {
@@ -545,12 +592,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     'linked_request_id' => $vehicle_request_id,
                     'linked_annonce_id' => (string) ((int) ($form_data['annonce_id'] ?? 0)),
                     'linked_title' => (string) ($form_data['annonce_title'] ?? ''),
-                    'objet' => 'Essai vehicule - ' . (string) ($form_data['annonce_title'] ?? 'Vehicule')
+                    'objet' => 'Essai véhicule - ' . (string) ($form_data['annonce_title'] ?? 'Véhicule')
                 ];
             }
 
             if ($shouldRedirectToRdv) {
-                $_SESSION['catalog_contact_success_notice'] = 'Demande enregistree. Merci de choisir maintenant votre rendez-vous.';
+                $_SESSION['catalog_contact_success_notice'] = 'Demande enregistrée. Merci de choisir maintenant votre rendez-vous.';
                 $rdvQuery = http_build_query(array_merge([
                     'customer_type' => $form_data['customer_type'],
                     'nom' => $form_data['nom'],
@@ -569,7 +616,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             if ($form_data["customer_type"] === 'professional') {
                 $identityMessage = htmlspecialchars($form_data["nom"]) . " (contact: " . htmlspecialchars($form_data["prenom"]) . ")";
             }
-            $message = "Merci " . $identityMessage . ", votre demande de devis a bien ete envoyee.";
+            $message = "Merci " . $identityMessage . ", votre demande de devis a bien été envoyée.";
             if ($reservation_marked) {
                 $message .= " La pièce est maintenant marquée comme indisponible suite à la confirmation de l'acompte.";
             }
@@ -644,8 +691,8 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact & Devis Gratuit | Clinik Auto – Garage à Scionzier (74)</title>
-    <meta name="description" content="Contactez le garage Clinik Auto à Scionzier (74950) : 06 20 18 56 27 ou clinikauto74@gmail.com. Demandez un devis gratuit pour révision, réparation ou achat de véhicule.">
+    <title>Contact Garage Clinik Auto Scionzier (74950) | 06 20 18 56 27 | Devis Gratuit</title>
+    <meta name="description" content="Contactez Clinik Auto à Scionzier (74950) : ☎ 06 20 18 56 27 – clinikauto74@gmail.com. Devis gratuit pour révision, réparation auto ou réservation de pièces & véhicules VO.">
     <meta name="keywords" content="contact garage Scionzier, devis révision 74, devis réparation auto Haute-Savoie, garage téléphone 74950, email garage Cluses, devis gratuit mécanique">
     <meta name="robots" content="index, follow">
     <meta name="geo.region" content="FR-74">
@@ -666,18 +713,11 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
     <script src="../assets/postal-city.js" defer></script>
     <script src="../assets/customer-type.js" defer></script>
     <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": [
-        {"@type": "ListItem", "position": 1, "name": "Accueil", "item": "https://www.clinikauto.fr/"},
-        {"@type": "ListItem", "position": 2, "name": "Contact", "item": "https://www.clinikauto.fr/contact/contact.php"}
-      ]
-    }
+        <?php echo json_encode($contactStructuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
     </script>
     <?php echo catalog_get_google_analytics_script(); ?>
 </head>
-<body>
+<body class="public-page">
     <header>
         <div class="site-brand">
             <a class="site-brand-link" href="../index.html" aria-label="Clinik Auto accueil">
@@ -695,16 +735,26 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
             </ul>
         </nav>
     </header>
-    <main>
-        <h2>Nous contacter</h2>
+    <main class="contact-page">
+        <section class="contact-hero">
+            <p class="contact-kicker">Parlons de votre véhicule</p>
+            <h1>Contact Clinik Auto</h1>
+            <p class="contact-hero-lead">Décrivez votre besoin en 2 minutes. Notre équipe vous répond rapidement pour organiser un devis, un essai ou une intervention atelier.</p>
+            <div class="contact-hero-actions">
+                <a href="tel:0620185627" class="cta-link">Appeler maintenant</a>
+                <a href="../devis/devis.php" class="cta-link-secondary">Demander un devis en ligne</a>
+            </div>
+        </section>
+
         <div class="contact-layout">
-            <div class="contact-column">
-                <h3>Informations</h3>
-                <p><strong>Adresse :</strong> 118 Clos des Teppes, 74950 Scionzier</p>
-                <p><strong>Téléphone :</strong> <a href="tel:0620185627">06 20 18 56 27</a></p>
-                <p><strong>Email :</strong> <a href="mailto:clinikauto74@gmail.com">clinikauto74@gmail.com</a></p>
-                <p><strong>Horaires :</strong></p>
-                <p>Lundi – Vendredi : 9h00–12h00 / 14h00–18h00<br>Samedi : 9h00–12h00<br>Dimanche : Fermé</p>
+            <div class="contact-column contact-info-card">
+                <h2>Informations pratiques</h2>
+                <ul class="contact-info-list">
+                    <li><strong>Adresse :</strong> 118 Clos des Teppes, 74950 Scionzier</li>
+                    <li><strong>Téléphone :</strong> <a href="tel:0620185627">06 20 18 56 27</a></li>
+                    <li><strong>Email :</strong> <a href="mailto:clinikauto74@gmail.com">clinikauto74@gmail.com</a></li>
+                    <li><strong>Horaires :</strong> Lundi - Vendredi : 9h00-12h00 / 14h00-18h00, Samedi : 9h00-12h00, Dimanche : Ferme</li>
+                </ul>
                 <div class="contact-actions">
                     <div class="map-embed">
                         <iframe
@@ -716,8 +766,9 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                     <a href="https://www.google.com/maps/dir/?api=1&amp;destination=118+Clos+des+Teppes%2C+74950+Scionzier" class="cta-link cta-inline" target="_blank" rel="noopener noreferrer">Lancer le trajet GPS →</a>
                 </div>
             </div>
-            <div class="contact-column">
-                <h3>Formulaire de contact</h3>
+            <div class="contact-column contact-form-card">
+                <h2>Formulaire de contact</h2>
+                <p class="contact-form-intro">Renseignez vos coordonnées et votre demande. Vous verrez un récapitulatif avant validation finale.</p>
                 <?php if ($message) { echo "<p class='success-message'>$message</p>"; } ?>
                 <?php if ($error_message) { echo "<p class='error-message'>" . e($error_message) . "</p>"; } ?>
                 <?php if ($recognized_message !== "") { echo "<p class='success-message'>" . e($recognized_message) . "</p>"; } ?>
@@ -890,7 +941,7 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                         <?php else: ?>
                             <label class="checkbox-toggle">
                                 <input type="checkbox" name="acompte_confirme" value="1" <?php echo $form_data["acompte_confirme"] === "1" ? "checked" : ""; ?>>
-                                J'ai deja effectue le virement instantane de l'acompte (30 %)
+                                J'ai déjà effectué le virement instantané de l'acompte (30 %)
                             </label>
                         <?php endif; ?>
                     <?php endif; ?>

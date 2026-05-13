@@ -3,6 +3,8 @@
 # Les limites PHP sont dans .user.ini (pas php_value ici)
 # =========================================================
 
+Options -Indexes
+
 # Activation HTTPS - décommenter après installation SSL sur o2switch :
 # RewriteEngine On
 # RewriteCond %{HTTPS} off
@@ -14,5 +16,10 @@
 </FilesMatch>
 
 <FilesMatch "^(config|composer)\.php$">
+    Require all denied
+</FilesMatch>
+
+# Bloque les fichiers caches, utilitaires dev et sauvegardes.
+<FilesMatch "(^\.|\.bak$|\.new$|\.ps1$|\.bat$|\.exe$|^tmp_.*\.php$|^test_.*\.php$|^diag_.*\.php$|^diag_.*\.ps1$|^email-log\.php$|^google-oauth-setup\.php$|^extracted_section\.txt$)">
     Require all denied
 </FilesMatch>
