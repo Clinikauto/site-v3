@@ -1274,7 +1274,7 @@ section[id^="section-"] {
 #admin-quick-open-all {
     grid-column: 3;
     grid-row: 2;
-    min-height: auto;
+    min-height: 0;
     padding: 4px 8px;
     font-size: 0.68rem;
 }
@@ -1282,7 +1282,7 @@ section[id^="section-"] {
 #admin-quick-close-all {
     grid-column: 4;
     grid-row: 2;
-    min-height: auto;
+    min-height: 0;
     padding: 4px 8px;
     font-size: 0.68rem;
 }
@@ -1355,7 +1355,7 @@ section[id^="section-"] {
 .admin-console-bar .admin-quick-command {
     width: auto;
     min-width: 0;
-    min-height: auto;
+    min-height: 0;
     height: auto;
     padding: 4px 8px;
     border-width: 1px;
