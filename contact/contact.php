@@ -712,10 +712,7 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
             <p class="contact-kicker">Parlons de votre véhicule</p>
             <h1>Contact Clinik Auto</h1>
             <p class="contact-hero-lead">Décrivez votre besoin en 2 minutes. Notre équipe vous répond rapidement pour organiser un devis, un essai ou une intervention atelier.</p>
-            <div class="contact-hero-actions">
-                <a href="tel:0620185627" class="cta-link">Appeler maintenant</a>
-                <a href="../devis/devis.php" class="cta-link-secondary">Demander un devis en ligne</a>
-            </div>
+            
         </section>
 
         <div class="contact-layout">
