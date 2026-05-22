@@ -1059,9 +1059,10 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                         <input type="checkbox" name="sans_vehicule" id="sans_vehicule" value="1" onchange="toggleImmat(this)" <?php echo $form_data["sans_vehicule"] === "1" ? "checked" : ""; ?>>
                         Ma demande ne concerne pas un véhicule
                     </label>
-                    <div id="immat-field">
+                    <?php $sans = ($form_data["sans_vehicule"] === "1"); ?>
+                    <div id="immat-field" <?php if ($sans) echo 'style="display:none"'; ?>>
                         <label>Immatriculation du véhicule
-                            <input type="text" name="immatriculation" id="immatriculation" placeholder="AA-123-BB" value="<?php echo e($form_data["immatriculation"]); ?>" required>
+                            <input type="text" name="immatriculation" id="immatriculation" placeholder="AA-123-BB" value="<?php echo e($form_data["immatriculation"]); ?>" <?php if (!$sans) echo 'required'; ?> >
                         </label>
                     </div>
                     <script>
