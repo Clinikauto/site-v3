@@ -1,9 +1,20 @@
 <?php
 require_once dirname(__DIR__) . "/config.php";
 require_once dirname(__DIR__) . "/includes/catalog_store.php";
+require_once dirname(__DIR__) . "/includes/security.php";
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
+}
+
+// CSRF: init and validate POST (toléré en local)
+csrf_init();
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+    if (!csrf_validate_request() && !CATALOG_IS_LOCAL_RUNTIME) {
+        http_response_code(400);
+        echo 'Requête invalide (CSRF)';
+        exit;
+    }
 }
 
 $showAdminReturn = catalog_is_admin_session_active();
@@ -48,80 +59,7 @@ $rdvStructuredData = [
 ];
 
 date_default_timezone_set("Europe/Paris");
-
-function get_easter_date(int $year): DateTimeImmutable
-{
-    $a = $year % 19;
-    $b = intdiv($year, 100);
-    $c = $year % 100;
-    $d = intdiv($b, 4);
-    $e = $b % 4;
-    $f = intdiv($b + 8, 25);
-    $g = intdiv($b - $f + 1, 3);
-    $h = (19 * $a + $b - $d - $g + 15) % 30;
-    $i = intdiv($c, 4);
-    $k = $c % 4;
-    $l = (32 + 2 * $e + 2 * $i - $h - $k) % 7;
-    $m = intdiv($a + 11 * $h + 22 * $l, 451);
-    $month = intdiv($h + $l - 7 * $m + 114, 31);
-    $day = (($h + $l - 7 * $m + 114) % 31) + 1;
-    return new DateTimeImmutable(sprintf("%04d-%02d-%02d", $year, $month, $day));
-}
-
-function get_holidays_for_year(int $year): array
-{
-    $easter = get_easter_date($year);
-    $fixed = [
-        sprintf("%04d-01-01", $year),
-        sprintf("%04d-05-01", $year),
-        sprintf("%04d-05-08", $year),
-        sprintf("%04d-07-14", $year),
-        sprintf("%04d-08-15", $year),
-        sprintf("%04d-11-01", $year),
-        sprintf("%04d-11-11", $year),
-        sprintf("%04d-12-25", $year),
-    ];
-
-    $moving = [
-        $easter->modify("+1 day")->format("Y-m-d"),   // Lundi de Paques
-        $easter->modify("+39 days")->format("Y-m-d"), // Ascension
-        $easter->modify("+50 days")->format("Y-m-d"), // Lundi de Pentecote
-    ];
-
-    return array_merge($fixed, $moving);
-}
-
-function is_closed_day(string $date): bool
-{
-    $day = DateTimeImmutable::createFromFormat("Y-m-d", $date);
-    if (!$day) {
-        return true;
-    }
-
-    $year = (int) $day->format("Y");
-    $holidays = get_holidays_for_year($year);
-    $is_sunday = $day->format("N") === "7";
-    return $is_sunday || in_array($date, $holidays, true);
-}
-
-function get_slots_for_date(string $date): array
-{
-    if (is_closed_day($date)) {
-        return [];
-    }
-
-    $day = DateTimeImmutable::createFromFormat("Y-m-d", $date);
-    if (!$day) {
-        return [];
-    }
-
-    $weekday = $day->format("N");
-    if ($weekday === "6") {
-        return ["09:00", "10:00", "11:00"];
-    }
-
-    return ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00"];
-}
+require_once dirname(__DIR__) . "/includes/schedule_helpers.php";
 
 $message = "";
 $error_message = "";
@@ -340,6 +278,7 @@ $all_holidays = array_values(array_unique(array_merge($holidays_this_year, $holi
         <?php echo json_encode($rdvStructuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
     </script>
     <?php echo catalog_get_google_analytics_script(); ?>
+    <?php if (function_exists('csrf_print_meta_and_js')) { csrf_print_meta_and_js(); } ?>
 </head>
 <body class="public-page">
     <header>
@@ -359,9 +298,13 @@ $all_holidays = array_values(array_unique(array_merge($holidays_this_year, $holi
             </ul>
         </nav>
     </header>
-    <main>
-        <h1>Prendre rendez-vous au garage</h1>
-        <p>Remplissez le formulaire ci-dessous, nous vous confirmons votre créneau dans les meilleurs délais.</p>
+    <main class="page-main-hero">
+        <section>
+            <span class="hero-badge">⭐ Votre garage de confiance</span>
+            <h1>Prendre rendez-vous au garage</h1>
+            <p>Remplissez le formulaire ci-dessous, nous vous confirmons votre créneau dans les meilleurs délais.</p>
+        </section>
+        <section class="spaced-section">
         <?php if ($prefill_notice !== '') { echo "<p class='success-message'>" . htmlspecialchars($prefill_notice) . "</p>"; } ?>
         <?php if ($message)       { echo "<p class='success-message'>" . htmlspecialchars($message) . "</p>"; } ?>
         <?php if ($error_message) { echo "<p class='error-message'>"   . htmlspecialchars($error_message) . "</p>"; } ?>
@@ -370,6 +313,7 @@ $all_holidays = array_values(array_unique(array_merge($holidays_this_year, $holi
         <form method="post">
             <div data-customer-type-context>
             <input type="hidden" name="customer_type" value="<?php echo ev($form['customer_type']); ?>" data-customer-type-input>
+            <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(csrf_get_token(), ENT_QUOTES, 'UTF-8') . '">'; ?>
             <input type="hidden" name="request_context_type" value="<?php echo ev($form['request_context_type']); ?>">
             <input type="hidden" name="linked_request_id" value="<?php echo ev($form['linked_request_id']); ?>">
             <input type="hidden" name="linked_annonce_id" value="<?php echo ev($form['linked_annonce_id']); ?>">
@@ -487,6 +431,7 @@ $all_holidays = array_values(array_unique(array_merge($holidays_this_year, $holi
         })();
         </script>
         <script src="../assets/conversion-tracking.js" defer></script>
+        </section><!-- /.spaced-section rdv form -->
     </main>
     <footer>
         <address>

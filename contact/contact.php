@@ -3,6 +3,9 @@ require_once dirname(__DIR__) . "/config.php";
 require_once dirname(__DIR__) . "/includes/catalog_store.php";
 require_once dirname(__DIR__) . "/includes/security.php";
 
+// schedule helpers (slots, jours fermés)
+require_once dirname(__DIR__) . "/includes/schedule_helpers.php";
+
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
@@ -751,6 +754,17 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                 <?php if ($recognized_message !== "") { echo "<p class='success-message'>" . e($recognized_message) . "</p>"; } ?>
                 <?php if ($recognized_incomplete_message !== "") { echo "<p class='error-message'>" . e($recognized_incomplete_message) . "</p>"; } ?>
 
+                <?php if (is_array($known_profile)): ?>
+                    <div class="review-card">
+                        <h4>Rappel fiche client</h4>
+                        <p><strong>Nom / Raison :</strong> <?php echo e($known_profile['lastname'] ?? 'N/A'); ?></p>
+                        <p><strong>Prénom :</strong> <?php echo e($known_profile['firstname'] ?? 'N/A'); ?></p>
+                        <p><strong>Email :</strong> <?php echo e($known_profile['email'] ?? 'N/A'); ?></p>
+                        <p><strong>Téléphone :</strong> <?php echo e($known_profile['phone'] ?? 'N/A'); ?></p>
+                        <p class="form-note">Vos informations connues ont été pré-remplies. Complétez ou modifiez si nécessaire avant le récapitulatif.</p>
+                    </div>
+                <?php endif; ?>
+
                 <?php if ($is_review): ?>
                 <div class="review-card">
                     <h4>Recapitulatif de votre demande</h4>
@@ -826,13 +840,17 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                     <input type="hidden" name="selected_vehicles_titles" value="<?php echo e($form_data["selected_vehicles_titles"]); ?>">
                     <div data-customer-type-context>
                     <input type="hidden" name="customer_type" value="<?php echo e($form_data["customer_type"]); ?>" data-customer-type-input>
-                    <label class="checkbox-toggle">
-                        <input type="checkbox" value="1" data-customer-type-checkbox <?php echo $form_data["customer_type"] === 'professional' ? 'checked' : ''; ?>>
-                        Je remplis ce formulaire en tant que professionnel
-                    </label>
-                    <label><span data-type-label-target data-individual-label="Nom" data-professional-label="Raison sociale"><?php echo e(contact_identity_label($form_data["customer_type"], "nom")); ?></span>
-                        <input type="text" name="nom" placeholder="Votre nom complet" data-type-placeholder-target data-individual-placeholder="Votre nom complet" data-professional-placeholder="Raison sociale de l'entreprise" value="<?php echo e($form_data["nom"]); ?>" required>
-                    </label>
+                        <label class="checkbox-toggle">
+                            <input type="checkbox" value="1" data-customer-type-checkbox <?php echo $form_data["customer_type"] === 'professional' ? 'checked' : ''; ?>>
+                            Je remplis ce formulaire en tant que professionnel
+                        </label>
+                        <!-- Email moved above identity fields as requested -->
+                        <label>Email
+                            <input type="email" name="email" placeholder="votre@email.fr" value="<?php echo e($form_data["email"]); ?>" required>
+                        </label>
+                        <label><span data-type-label-target data-individual-label="Nom" data-professional-label="Raison sociale"><?php echo e(contact_identity_label($form_data["customer_type"], "nom")); ?></span>
+                            <input type="text" name="nom" placeholder="Votre nom complet" data-type-placeholder-target data-individual-placeholder data-professional-placeholder="Raison sociale de l'entreprise" value="<?php echo e($form_data["nom"]); ?>" required>
+                        </label>
                     <label><span data-type-label-target data-individual-label="Prénom" data-professional-label="Nom du contact"><?php echo e(contact_identity_label($form_data["customer_type"], "prenom")); ?></span>
                         <input type="text" name="prenom" placeholder="Votre prénom" data-type-placeholder-target data-individual-placeholder="Votre prénom" data-professional-placeholder="Nom et prénom du contact" value="<?php echo e($form_data["prenom"]); ?>" required>
                     </label>
