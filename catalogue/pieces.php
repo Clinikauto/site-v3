@@ -209,7 +209,7 @@ $piecesStructuredData = [
                     </div>
 
                     <div class="deposit-note">
-                        <strong>Acompte de réservation :</strong> <?php echo $deposit; ?> € par virement instantané, soit 30 % du montant affiché.
+                        <strong>Acompte de réservation :</strong> <?php echo catalog_escape((string) $deposit); ?> € par virement instantané, soit 30 % du montant affiché.
                     </div>
 
                     <div class="deposit-note multi-deposit-note">
