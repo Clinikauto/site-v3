@@ -708,7 +708,7 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
         </nav>
     </header>
     <main class="contact-page">
-        <section class="contact-hero">
+        <section>
             <p class="contact-kicker">Parlons de votre véhicule</p>
             <h1>Contact Clinik Auto</h1>
             <p class="contact-hero-lead">Décrivez votre besoin en 2 minutes. Notre équipe vous répond rapidement pour organiser un devis, un essai ou une intervention atelier.</p>
