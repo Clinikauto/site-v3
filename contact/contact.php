@@ -6,6 +6,22 @@ require_once dirname(__DIR__) . "/includes/security.php";
 // schedule helpers (slots, jours fermés)
 require_once dirname(__DIR__) . "/includes/schedule_helpers.php";
 
+// prepare date min and holidays for JS and validation
+$tomorrow = (new DateTimeImmutable("tomorrow"))->format("Y-m-d");
+$holidays_this_year = get_holidays_for_year((int) date("Y"));
+$holidays_next_year = get_holidays_for_year((int) date("Y") + 1);
+$all_holidays = array_values(array_unique(array_merge($holidays_this_year, $holidays_next_year)));
+// build a small client-side slots cache for the coming days
+$client_slots = [];
+$days_ahead = 21;
+for ($i = 0; $i < $days_ahead; $i++) {
+    $d = (new DateTimeImmutable("tomorrow + $i days"))->format('Y-m-d');
+    $slots = get_slots_for_date($d);
+    if (!empty($slots)) {
+        $client_slots[$d] = $slots;
+    }
+}
+
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
@@ -142,6 +158,7 @@ $form_data = [
     "annonce_title" => "",
     "annonce_price" => "",
     "date_essai" => "",
+    "heure" => "",
     "acompte_montant" => "",
     "acompte_confirme" => "",
     "virement_compte_id" => "",
@@ -403,6 +420,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $error_message = "Veuillez remplir tous les champs obligatoires avant de continuer.";
     } elseif ($email_invalide) {
         $error_message = "L'adresse email saisie n'est pas valide. Exemple attendu : prenom@domaine.fr";
+    } elseif ($form_action === "review" && $form_data["contact_action"] === "vehicle_visit") {
+        // validate requested test drive date and hour
+        $selected_day = DateTimeImmutable::createFromFormat("Y-m-d", $form_data["date_essai"]);
+        if (!$selected_day) {
+            $error_message = "La date d'essai fournie est invalide.";
+        } elseif ($form_data["date_essai"] < $tomorrow) {
+            $error_message = "La date de rendez-vous doit être au minimum le lendemain.";
+        } elseif (is_closed_day($form_data["date_essai"])) {
+            $error_message = "Le garage est fermé à cette date (dimanche ou jour férié). Choisissez une autre date.";
+        } else {
+            // if hour provided, ensure it's within allowed slots
+            $allowed = get_slots_for_date($form_data["date_essai"]);
+            if ($form_data["heure"] !== "" && !in_array($form_data["heure"], $allowed, true)) {
+                $error_message = "Le créneau horaire sélectionné n'est pas disponible pour la date choisie.";
+            }
+        }
     } elseif ($form_action === "review") {
         catalog_save_customer_profile([
             "customer_type" => $form_data["customer_type"],
@@ -417,6 +450,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         ], "contact_review");
         $is_review = true;
     } elseif ($form_action === "submit") {
+        $dry_run_mode = defined('DRY_RUN_MODE') && DRY_RUN_MODE;
         $email_sent = false;
         $db_saved = false;
         $vehicle_request_saved = false;
@@ -431,17 +465,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $form_data["contact_action"] === "vehicle_visit" &&
             (int) ($form_data["annonce_id"] ?? 0) > 0
         ) {
-            list($vehicle_request_saved, $vehicle_request_active, $vehicle_note, $vehicle_request_id) = catalog_register_vehicle_request((int) $form_data["annonce_id"], [
-                "firstname" => $form_data["prenom"],
-                "lastname" => $form_data["nom"],
-                "email" => $form_data["email"],
-                "phone" => $form_data["telephone"],
-                "desired_date" => $form_data["date_essai"],
-                "message" => $form_data["message"]
-            ]);
+            if (!$dry_run_mode) {
+                list($vehicle_request_saved, $vehicle_request_active, $vehicle_note, $vehicle_request_id) = catalog_register_vehicle_request((int) $form_data["annonce_id"], [
+                    "firstname" => $form_data["prenom"],
+                    "lastname" => $form_data["nom"],
+                    "email" => $form_data["email"],
+                    "phone" => $form_data["telephone"],
+                    "desired_date" => $form_data["date_essai"],
+                    "message" => $form_data["message"]
+                ]);
+            } else {
+                $vehicle_request_saved = false;
+                $vehicle_request_active = false;
+                $vehicle_request_id = '';
+                $vehicle_note = '(DRY-RUN)';
+            }
         }
 
-        catalog_save_customer_profile([
+        if (!$dry_run_mode) {
+            catalog_save_customer_profile([
             "customer_type" => $form_data["customer_type"],
             "firstname" => $form_data["prenom"],
             "lastname" => $form_data["nom"],
@@ -452,8 +494,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "phone" => $form_data["telephone"],
             "registration" => $form_data["immatriculation"]
         ], "contact");
+        } else {
+            // skip saving profile in dry-run
+        }
 
-        if ($form_data["email"] !== "" && filter_var($form_data["email"], FILTER_VALIDATE_EMAIL)) {
+        if (!$dry_run_mode && $form_data["email"] !== "" && filter_var($form_data["email"], FILTER_VALIDATE_EMAIL)) {
             setcookie(catalog_identity_cookie_name(), strtolower(trim((string) $form_data["email"])), time() + 31536000, "/", "", false, true);
         }
 
@@ -461,17 +506,24 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $form_data["contact_action"] === "part_reservation" &&
             (int) ($form_data["annonce_id"] ?? 0) > 0
         ) {
-            list($part_request_saved, $reservation_marked, $part_note, $part_request_id) = catalog_register_part_request(
-                (int) $form_data["annonce_id"],
-                [
-                    "firstname" => $form_data["prenom"],
-                    "lastname" => $form_data["nom"],
-                    "email" => $form_data["email"],
-                    "phone" => $form_data["telephone"],
-                    "message" => $form_data["message"]
-                ],
-                ($form_data["acompte_confirme"] === "1")
-            );
+            if (!$dry_run_mode) {
+                list($part_request_saved, $reservation_marked, $part_note, $part_request_id) = catalog_register_part_request(
+                    (int) $form_data["annonce_id"],
+                    [
+                        "firstname" => $form_data["prenom"],
+                        "lastname" => $form_data["nom"],
+                        "email" => $form_data["email"],
+                        "phone" => $form_data["telephone"],
+                        "message" => $form_data["message"]
+                    ],
+                    ($form_data["acompte_confirme"] === "1")
+                );
+            } else {
+                $part_request_saved = false;
+                $reservation_marked = false;
+                $part_note = '(DRY-RUN)';
+                $part_request_id = '';
+            }
         }
 
         $destinataire = defined("GARAGE_EMAIL") ? GARAGE_EMAIL : "clinikauto74@gmail.com";
@@ -501,15 +553,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "Véhicules sélectionnés (nb): " . ($form_data["selected_vehicles_count"] !== "" ? $form_data["selected_vehicles_count"] : "N/A") . "\n" .
             "IDs véhicules sélectionnés: " . ($form_data["selected_vehicles_ids"] !== "" ? $form_data["selected_vehicles_ids"] : "N/A") . "\n" .
             "Titres véhicules sélectionnés: " . ($form_data["selected_vehicles_titles"] !== "" ? $form_data["selected_vehicles_titles"] : "N/A") . "\n" .
-            "Date d'essai souhaitée: " . ($form_data["date_essai"] !== "" ? $form_data["date_essai"] : "N/A") . "\n" .
+            "Date d'essai souhaitée: " . ($form_data["date_essai"] !== "" ? $form_data["date_essai"] : "N/A") . (isset($form_data["heure"]) && $form_data["heure"] !== "" ? " à " . $form_data["heure"] : "") . "\n" .
             "Sujet: " . $form_data["sujet"] . "\n" .
             "Prestations: " . $form_data["prestations"] . "\n\n" .
             "Message:\n" . $form_data["message"] . "\n";
 
         $safe_sender = preg_replace('/[\r\n]+/', '', $form_data["email"]);
-        $email_sent = send_devis_email($destinataire, $safe_sender, $email_subject, $email_body);
+        if (!$dry_run_mode) {
+            $email_sent = send_devis_email($destinataire, $safe_sender, $email_subject, $email_body);
+        } else {
+            // simulate success in dry-run so the UX flow can be tested without side-effects
+            $email_sent = true;
+            $db_saved = true;
+        }
 
-        if (defined("DB_HOST") && defined("DB_USER") && defined("DB_PASS") && defined("DB_NAME")) {
+        if (!$dry_run_mode && defined("DB_HOST") && defined("DB_USER") && defined("DB_PASS") && defined("DB_NAME")) {
             mysqli_report(MYSQLI_REPORT_OFF);
             $dbPort = defined('DB_PORT') ? (int) DB_PORT : 3306;
             $conn = @new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, $dbPort);
@@ -791,6 +849,9 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                     <?php endif; ?>
                     <?php if ($form_data["contact_action"] === "vehicle_visit" && $form_data["date_essai"] !== ""): ?>
                     <p><strong>Date d'essai souhaitée :</strong> <?php echo e($form_data["date_essai"]); ?></p>
+                    <?php if (!empty($form_data["heure"])): ?>
+                    <p><strong>Heure souhaitée :</strong> <?php echo e($form_data["heure"]); ?></p>
+                    <?php endif; ?>
                     <?php endif; ?>
                     <?php if ($form_data["contact_action"] === "part_reservation"): ?>
                     <p><strong>Acompte 30 % confirmé :</strong> <?php echo $form_data["acompte_confirme"] === "1" ? "Oui" : "Non"; ?></p>
@@ -825,7 +886,13 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                 <form method="post">
                     <input type="hidden" name="form_action" value="review">
                     <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(csrf_get_token(), ENT_QUOTES, 'UTF-8') . '">'; ?>
-                    <input type="hidden" name="contact_action" value="<?php echo e($form_data["contact_action"]); ?>">
+                    <label>Type de demande
+                        <select name="contact_action" id="contact_action_select">
+                            <option value="" <?php echo $form_data["contact_action"] === '' ? 'selected' : ''; ?>>Contact / Devis</option>
+                            <option value="vehicle_visit" <?php echo $form_data["contact_action"] === 'vehicle_visit' ? 'selected' : ''; ?>>Prendre rendez‑vous</option>
+                            <option value="part_reservation" <?php echo $form_data["contact_action"] === 'part_reservation' ? 'selected' : ''; ?>>Réserver une pièce</option>
+                        </select>
+                    </label>
                     <input type="hidden" name="annonce_id" value="<?php echo e($form_data["annonce_id"]); ?>">
                     <input type="hidden" name="annonce_type" value="<?php echo e($form_data["annonce_type"]); ?>">
                     <input type="hidden" name="annonce_title" value="<?php echo e($form_data["annonce_title"]); ?>">
@@ -918,11 +985,16 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                     <label>Sujet
                         <input type="text" name="sujet" placeholder="Objet de votre message" value="<?php echo e($form_data["sujet"]); ?>" required>
                     </label>
-                    <?php if ($form_data["contact_action"] === "vehicle_visit"): ?>
-                    <label>Date souhaitée pour l'essai
-                        <input type="date" name="date_essai" value="<?php echo e($form_data["date_essai"]); ?>" required>
-                    </label>
-                    <?php endif; ?>
+                    <div id="rdv-fields" style="<?php echo $form_data['contact_action'] === 'vehicle_visit' ? '' : 'display:none;'; ?>">
+                        <label>Date souhaitée pour l'essai
+                            <input type="date" id="date_essai" name="date_essai" value="<?php echo e($form_data["date_essai"]); ?>" min="<?php echo $tomorrow; ?>">
+                        </label>
+                        <label>Heure souhaitée
+                            <select id="heure_essai" name="heure">
+                                <option value="" disabled <?php echo $form_data['heure'] === '' ? 'selected' : ''; ?>>Choisissez un créneau…</option>
+                            </select>
+                        </label>
+                    </div>
                     <?php if ($form_data["contact_action"] === "part_reservation"): ?>
                         <?php if ($virement_lock_mode): ?>
                             <input type="hidden" name="acompte_confirme" value="1">
@@ -958,6 +1030,51 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                 <?php endif; ?>
             </div>
         </div>
+    <script>
+    (function(){
+        var contactSelect = document.getElementById('contact_action_select');
+        var rdvFields = document.getElementById('rdv-fields');
+        var dateInput = document.getElementById('date_essai');
+        var heureSelect = document.getElementById('heure_essai');
+        var minDate = <?php echo json_encode($tomorrow); ?>;
+        var holidays = <?php echo json_encode($all_holidays); ?>;
+        var slots = <?php echo json_encode($client_slots, JSON_UNESCAPED_UNICODE); ?>;
+
+        function makeOption(val, text, disabled) {
+            var o = document.createElement('option');
+            o.value = val;
+            o.textContent = text || val;
+            if (disabled) o.disabled = true;
+            return o;
+        }
+
+        function populateHoursFor(dateStr){
+            if (!heureSelect) return;
+            while (heureSelect.options.length) heureSelect.remove(0);
+            var daySlots = slots[dateStr] || [];
+            if (daySlots.length === 0) {
+                heureSelect.appendChild(makeOption('', 'Aucun créneau disponible', true));
+                return;
+            }
+            heureSelect.appendChild(makeOption('', 'Choisissez un créneau…', true));
+            daySlots.forEach(function(s){ heureSelect.appendChild(makeOption(s)); });
+            var prev = <?php echo json_encode($form_data['heure']); ?>;
+            if (prev) { try { heureSelect.value = prev; } catch (e) {} }
+        }
+
+        if (contactSelect) {
+            contactSelect.addEventListener('change', function(){
+                if (this.value === 'vehicle_visit') { rdvFields.style.display = ''; }
+                else { rdvFields.style.display = 'none'; }
+            });
+        }
+        if (dateInput) {
+            dateInput.setAttribute('min', minDate);
+            dateInput.addEventListener('change', function(){ populateHoursFor(this.value); });
+            if (dateInput.value) populateHoursFor(dateInput.value);
+        }
+    })();
+    </script>
     </main>
     <footer>
         <address>
