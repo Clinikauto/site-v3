@@ -128,6 +128,7 @@ $catalogStructuredData = [
     <script type="application/ld+json">
         <?php echo json_encode($catalogStructuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
     </script>
+    <?php if (function_exists('csrf_print_meta_and_js')) { csrf_print_meta_and_js(); } ?>
 </head>
 <body class="public-page">
     <header>
@@ -147,9 +148,11 @@ $catalogStructuredData = [
         </nav>
     </header>
     <main class="catalog-home">
-        <span class="hero-badge">Catalogue dynamique</span>
-        <h1>Catalogue auto Clinik Auto : véhicules et pièces d'occasion</h1>
-        <p>Accédez aux véhicules d'occasion et aux pièces disponibles depuis deux espaces distincts. Chaque ligne d'annonce ouvre sa fiche détaillée avec galerie photo, renseignements complets et action directe vers le formulaire de contact.</p>
+        <section>
+            <span class="hero-badge">⭐ Votre garage de confiance</span>
+            <h1>Catalogue auto Clinik Auto : véhicules et pièces d'occasion</h1>
+            <p>Accédez aux véhicules d'occasion et aux pièces disponibles depuis deux espaces distincts. Chaque ligne d'annonce ouvre sa fiche détaillée avec galerie photo, renseignements complets et action directe vers le formulaire de contact.</p>
+        </section>
 
         <div class="catalog-split-grid">
             <section class="inventory-block">
@@ -158,17 +161,20 @@ $catalogStructuredData = [
                         <h3>Nos véhicules disponibles</h3>
                         <p>Consultez les annonces véhicules et ouvrez chaque fiche en détail.</p>
                     </div>
-                    <a class="cta-link cta-link-small" href="occasion.php">Voir les occasions →</a>
+                    <a class="cta-link cta-link-small" href="/catalogue/occasion.php">Voir les véhicules →</a>
                 </div>
                 <div class="inventory-list compact-list">
                     <?php foreach ($vehicles as $vehicle): ?>
-                        <a class="inventory-row" href="occasion.php?id=<?php echo (int) $vehicle['id']; ?>">
+                        <a class="inventory-row <?php echo (($vehicle['status'] ?? '') === 'reserved') ? 'is-unavailable' : ''; ?> <?php echo !empty($vehicle['transaction_in_progress']) ? 'is-transaction' : ''; ?>" href="occasion.php?id=<?php echo (int) $vehicle['id']; ?>">
                             <img class="inventory-thumb" src="<?php echo catalog_escape(catalog_primary_image($vehicle)); ?>" alt="<?php echo catalog_escape($vehicle['title']); ?>">
                             <span class="inventory-row-text">
                                 <strong><?php echo catalog_escape($vehicle['title']); ?></strong>
                                 <small><?php echo catalog_escape($vehicle['subtitle']); ?></small>
                             </span>
-                            <span class="inventory-price"><?php echo catalog_escape(catalog_format_price($vehicle['price'])); ?> €</span>
+                            <span class="inventory-side-meta">
+                                <span class="inventory-price"><?php echo catalog_escape(catalog_format_price($vehicle['price'])); ?> €</span>
+                                <span class="status-pill <?php echo (($vehicle['status'] ?? '') === 'reserved') ? 'is-muted' : ''; ?>"><?php echo catalog_escape(catalog_status_label($vehicle)); ?></span>
+                            </span>
                         </a>
                     <?php endforeach; ?>
                 </div>
@@ -184,13 +190,16 @@ $catalogStructuredData = [
                 </div>
                 <div class="inventory-list compact-list">
                     <?php foreach ($parts as $part): ?>
-                        <a class="inventory-row" href="pieces.php?id=<?php echo (int) $part['id']; ?>">
+                        <a class="inventory-row <?php echo (($part['status'] ?? '') === 'reserved') ? 'is-unavailable' : ''; ?> <?php echo !empty($part['transaction_in_progress']) ? 'is-transaction' : ''; ?>" href="pieces.php?id=<?php echo (int) $part['id']; ?>">
                             <img class="inventory-thumb" src="<?php echo catalog_escape(catalog_primary_image($part)); ?>" alt="<?php echo catalog_escape($part['title']); ?>">
                             <span class="inventory-row-text">
                                 <strong><?php echo catalog_escape($part['title']); ?></strong>
                                 <small><?php echo catalog_escape($part['subtitle']); ?></small>
                             </span>
-                            <span class="inventory-price"><?php echo catalog_escape(catalog_format_price($part['price'])); ?> €</span>
+                            <span class="inventory-side-meta">
+                                <span class="inventory-price"><?php echo catalog_escape(catalog_format_price($part['price'])); ?> €</span>
+                                <span class="status-pill <?php echo (($part['status'] ?? '') === 'reserved') ? 'is-muted' : ''; ?>"><?php echo catalog_escape(catalog_status_label($part)); ?></span>
+                            </span>
                         </a>
                     <?php endforeach; ?>
                 </div>
