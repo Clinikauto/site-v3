@@ -363,15 +363,19 @@ main p {
 
 .contact-hero {
     margin-bottom: 26px;
-    padding: 26px;
-    border-radius: 22px;
-    /* Restored original visual: dark gradient with warm accent */
+    padding: 28px 20px;
+    border-radius: 20px;
+    /* Use the standard hero visual and centering for consistency */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     background:
         radial-gradient(1200px 280px at 10% -40%, rgba(255, 190, 46, 0.26), transparent 55%),
-        linear-gradient(135deg, #142444 0%, #1a315d 42%, #203c71 100%);
+        linear-gradient(135deg, var(--brand-navy) 0%, #17284d 48%, var(--brand-red) 100%);
     color: var(--brand-white);
     box-shadow: 0 16px 34px rgba(17, 26, 47, 0.28);
-    /* Slight text shadow to keep readability against gradients */
     text-shadow: 0 1px 2px rgba(0,0,0,0.45);
 }
 
