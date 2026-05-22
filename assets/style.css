@@ -167,7 +167,7 @@ main h2 {
 .hero-badge {
     display: inline-block;
     background: #c7d3d3;
-    color: var(--brand-navy);
+    color: #111a2f;
     font-weight: 700;
     font-size: 0.82em;
     padding: 6px 16px;
