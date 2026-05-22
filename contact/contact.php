@@ -1055,7 +1055,7 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                     <label>Téléphone
                         <input type="tel" name="telephone" placeholder="06 12 34 56 78" value="<?php echo e($form_data["telephone"]); ?>" required>
                     </label>
-                    <label class="checkbox-toggle">
+                    <label class="checkbox-toggle centered-toggle">
                         <input type="checkbox" name="sans_vehicule" id="sans_vehicule" value="1" onchange="toggleImmat(this)" <?php echo $form_data["sans_vehicule"] === "1" ? "checked" : ""; ?>>
                         Ma demande ne concerne pas un véhicule
                     </label>
