@@ -382,18 +382,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Si la demande ne concerne pas un véhicule, redirection immédiate vers le formulaire RDV
     // avec récupération des informations déjà saisies (même partielles)
     if ($form_action === "review" && $form_data["sans_vehicule"] === "1") {
-        $rdv_query = http_build_query([
-            "customer_type" => $form_data["customer_type"],
-            "nom" => $form_data["nom"],
-            "prenom" => $form_data["prenom"],
-            "adresse" => $form_data["adresse"],
-            "code_postal" => $form_data["code_postal"],
-            "ville" => $form_data["ville"],
-            "telephone" => $form_data["telephone"],
-            "email" => $form_data["email"],
-        ]);
-        header("Location: ../rdv/rdv.php?" . $rdv_query);
-        exit;
+        // Ne plus rediriger vers rdv.php : afficher le récapitulatif inline
+        // Validation ultérieure décidera d'afficher ou non le récapitulatif
+        // s'assurer que les champs date/heure/objet sont disponibles dans le récap
+        $form_data["date_essai"] = $form_data["date_essai"] ?? '';
+        $form_data["heure"] = $form_data["heure"] ?? '';
+        $form_data["sujet"] = $form_data["sujet"] ?? '';
     }
 
     $required_fields = [
@@ -450,10 +444,32 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $allowed = get_slots_for_date($form_data["date_essai"]);
             if ($form_data["heure"] !== "" && !in_array($form_data["heure"], $allowed, true)) {
                 $error_message = "Le créneau horaire sélectionné n'est pas disponible pour la date choisie.";
+            } else {
+                // validation OK -> save profile and show review (same as other review branch)
+                catalog_save_customer_profile([
+                    "customer_type" => $form_data["customer_type"],
+                    "firstname" => $form_data["prenom"],
+                    "lastname" => $form_data["nom"],
+                    "address_line" => $form_data["adresse"],
+                    "postal_code" => $form_data["code_postal"],
+                    "city" => $form_data["ville"],
+                    "email" => $form_data["email"],
+                    "phone" => $form_data["telephone"],
+                    "registration" => $form_data["immatriculation"]
+                ], "contact_review");
+                $is_review = true;
             }
         }
-    } elseif ($form_action === "review") {
-        catalog_save_customer_profile([
+    } elseif ($form_action === "review" ) {
+        // Pour le parcours Contact/Devis : si aucune prestation n'est sélectionnée,
+        // exiger un message descriptif côté serveur (au moins 10 caractères)
+        $prest_val = trim($form_data["prestations"] ?? "");
+        $msg_text = trim($form_data["message"] ?? "");
+        $msg_len = function_exists('mb_strlen') ? mb_strlen($msg_text, 'UTF-8') : strlen($msg_text);
+        if ($prest_val === "" && $msg_len < 10) {
+            $error_message = "Pour demander un devis, décrivez svp les prestations souhaitées (au moins 10 caractères) ou sélectionnez des prestations depuis le catalogue.";
+        } else {
+            catalog_save_customer_profile([
             "customer_type" => $form_data["customer_type"],
             "firstname" => $form_data["prenom"],
             "lastname" => $form_data["nom"],
@@ -463,8 +479,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "email" => $form_data["email"],
             "phone" => $form_data["telephone"],
             "registration" => $form_data["immatriculation"]
-        ], "contact_review");
-        $is_review = true;
+            ], "contact_review");
+            $is_review = true;
+        }
     } elseif ($form_action === "submit") {
         $dry_run_mode = defined('DRY_RUN_MODE') && DRY_RUN_MODE;
         $email_sent = false;
@@ -661,19 +678,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
 
             if ($shouldRedirectToRdv) {
-                $_SESSION['catalog_contact_success_notice'] = 'Demande enregistrée. Merci de choisir maintenant votre rendez-vous.';
-                $rdvQuery = http_build_query(array_merge([
-                    'customer_type' => $form_data['customer_type'],
-                    'nom' => $form_data['nom'],
-                    'prenom' => $form_data['prenom'],
-                    'adresse' => $form_data['adresse'],
-                    'code_postal' => $form_data['code_postal'],
-                    'ville' => $form_data['ville'],
-                    'telephone' => $form_data['telephone'],
-                    'email' => $form_data['email']
-                ], $rdvContext));
-                header('Location: ../rdv/rdv.php?' . $rdvQuery);
-                exit;
+                // Ne plus utiliser rdv.php : afficher confirmation inline puis rediriger vers l'accueil
+                $message = 'Demande enregistrée. Nous traitons votre demande et reviendrons vers vous pour fixer le rendez-vous.';
+                // joindre un court contexte au message si disponible
+                if (!empty($rdvContext['objet'])) {
+                    $message .= ' (Objet : ' . htmlspecialchars($rdvContext['objet'], ENT_QUOTES, 'UTF-8') . ').';
+                }
+                // ne pas rediriger, laisser le flux continuer pour afficher le message/modal
             }
 
             $identityMessage = htmlspecialchars($form_data["prenom"]) . " " . htmlspecialchars($form_data["nom"]);
@@ -859,8 +870,7 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                         <iframe
                             src="https://www.google.com/maps?q=118+Clos+des+Teppes%2C+74950+Scionzier&output=embed"
                             title="Plan Clinik Auto"
-                            loading="lazy"
-                            referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            loading="lazy"></iframe>
                     </div>
                     <a href="https://www.google.com/maps/dir/?api=1&amp;destination=118+Clos+des+Teppes%2C+74950+Scionzier" class="cta-link cta-inline" target="_blank" rel="noopener noreferrer">Lancer le trajet GPS →</a>
                     <div class="contact-trust-note">
@@ -876,7 +886,32 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
             <div class="contact-column contact-form-card">
                 <h2>Formulaire de contact</h2>
                 <p class="contact-form-intro">Renseignez vos coordonnées et votre demande. Vous verrez un récapitulatif avant validation finale.</p>
-                <?php if ($message) { echo "<p class='success-message'>$message</p>"; } ?>
+                <?php if ($message): ?>
+                    <div id="auto-confirm-modal-contact" class="auto-confirm-modal" aria-hidden="true">
+                        <div class="auto-confirm-modal__panel">
+                            <span class="hero-badge">⭐ Votre garage de confiance</span>
+                            <h2><?php echo e($message); ?></h2>
+                            <p>Merci d'avoir contacté ClinikAuto</p>
+                        </div>
+                    </div>
+                    <script>
+                    (function () {
+                        try {
+                            var modal = document.getElementById('auto-confirm-modal-contact');
+                            if (!modal) return;
+                            modal.style.display = 'flex';
+                            void modal.offsetWidth;
+                            modal.style.opacity = '1';
+                            setTimeout(function () {
+                                modal.style.opacity = '0';
+                                setTimeout(function () {
+                                    window.location = '/index.html';
+                                }, 300);
+                            }, 3000);
+                        } catch (e) { /* silent */ }
+                    })();
+                    </script>
+                <?php endif; ?>
                 <?php if ($error_message) { echo "<p class='error-message'>" . e($error_message) . "</p>"; } ?>
                 <?php if ($recognized_message !== "") { echo "<p class='success-message'>" . e($recognized_message) . "</p>"; } ?>
                 <?php if ($recognized_incomplete_message !== "") { echo "<p class='error-message'>" . e($recognized_incomplete_message) . "</p>"; } ?>
@@ -893,8 +928,8 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                 <?php endif; ?>
 
                 <?php if ($is_review): ?>
-                <div class="review-card">
-                    <h4>Recapitulatif de votre demande</h4>
+                <div id="review-card" class="review-card">
+                    <h4 id="review-card-heading" tabindex="-1">Recapitulatif de votre demande</h4>
                     <p><strong>Type de demande :</strong> <?php echo e(contact_request_context($form_data)); ?></p>
                     <p><strong>Type client :</strong> <?php echo $form_data["customer_type"] === 'professional' ? 'Professionnel' : 'Particulier'; ?></p>
                     <p><strong><?php echo e(contact_identity_label($form_data["customer_type"], "nom")); ?> :</strong> <?php echo e($form_data["nom"]); ?></p>
@@ -950,6 +985,21 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                         <button type="submit" name="form_action" value="submit">Valider votre demande de devis →</button>
                         <button class="btn-secondary" type="submit" name="form_action" value="edit">Modifier les informations</button>
                     </form>
+                    <script>
+                    (function () {
+                        try {
+                            var reviewEl = document.getElementById('review-card');
+                            var heading = document.getElementById('review-card-heading');
+                            if (!reviewEl) return;
+                            // smooth scroll to center of viewport and focus heading for accessibility
+                            reviewEl.scrollIntoView({behavior: 'smooth', block: 'center'});
+                            if (heading) {
+                                // focus without scrolling (we already scrolled)
+                                heading.focus({preventScroll: true});
+                            }
+                        } catch (e) { /* silent */ }
+                    })();
+                    </script>
                 </div>
                 <?php else: ?>
                 <form method="post">
@@ -959,7 +1009,6 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                         <select name="contact_action" id="contact_action_select">
                             <option value="" <?php echo $form_data["contact_action"] === '' ? 'selected' : ''; ?>>Contact / Devis</option>
                             <option value="vehicle_visit" <?php echo $form_data["contact_action"] === 'vehicle_visit' ? 'selected' : ''; ?>>Prendre rendez‑vous</option>
-                            <option value="part_reservation" <?php echo $form_data["contact_action"] === 'part_reservation' ? 'selected' : ''; ?>>Réserver une pièce</option>
                         </select>
                     </label>
                     <input type="hidden" name="annonce_id" value="<?php echo e($form_data["annonce_id"]); ?>">
@@ -1051,7 +1100,7 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                     <label>Sujet
                         <input type="text" name="sujet" placeholder="Objet de votre message" value="<?php echo e($form_data["sujet"]); ?>" required>
                     </label>
-                    <div id="rdv-fields" style="<?php echo $form_data['contact_action'] === 'vehicle_visit' ? '' : 'display:none;'; ?>">
+                    <div id="rdv-fields" class="<?php echo $form_data['contact_action'] === 'vehicle_visit' ? 'rdv-visible' : ''; ?>">
                         <label>Date souhaitée pour l'essai
                             <input type="date" id="date_essai" name="date_essai" value="<?php echo e($form_data["date_essai"]); ?>" min="<?php echo $tomorrow; ?>">
                         </label>
@@ -1139,6 +1188,69 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
             dateInput.addEventListener('change', function(){ populateHoursFor(this.value); });
             if (dateInput.value) populateHoursFor(dateInput.value);
         }
+
+        // Client-side submit guard to provide clear feedback for 'Prendre rendez-vous' and 'Contact / Devis'
+        (function(){
+            try {
+                // cibler explicitement le formulaire principal dans la carte de formulaire
+                var reviewForm = document.querySelector('.contact-form-card > form');
+                if (!reviewForm) {
+                    var reviewFormTrigger = document.querySelector('form input[name="form_action"][value="review"]');
+                    if (!reviewFormTrigger) return;
+                    reviewForm = reviewFormTrigger.closest('form');
+                }
+                if (!reviewForm) return;
+
+                // anti-réentrance : empêche une boucle de handlers
+                if (reviewForm.__submitGuardAttached) return;
+                reviewForm.__submitGuardAttached = true;
+
+                reviewForm.addEventListener('submit', function (ev) {
+                    try {
+                        if (reviewForm.__submitGuardBusy) return;
+                        reviewForm.__submitGuardBusy = true;
+                        setTimeout(function(){ reviewForm.__submitGuardBusy = false; }, 600);
+                        var action = (contactSelect && contactSelect.value) || '';
+                    if (action === 'vehicle_visit') {
+                        var immat = document.getElementById('immatriculation');
+                        var dateVal = dateInput ? dateInput.value : '';
+                        if (!immat || immat.value.trim() === '' || !dateVal) {
+                            ev.preventDefault();
+                            var firstMissing = !immat || immat.value.trim() === '' ? immat : dateInput;
+                            if (firstMissing) {
+                                firstMissing.scrollIntoView({behavior: 'smooth', block: 'center'});
+                                firstMissing.focus();
+                            }
+                            alert('Veuillez remplir l\'immatriculation et la date souhaitée pour continuer vers le récapitulatif.');
+                            return false;
+                        }
+                    }
+
+                    // For Contact / Devis (empty contact_action value), require either a prefilled 'prestations' or a descriptive message
+                    if (action === '') {
+                        var prestationsInput = document.querySelector('textarea[name="prestations"]') || document.querySelector('input[name="prestations"]');
+                        var prestationsVal = prestationsInput ? prestationsInput.value.trim() : '';
+                        var messageEl = document.querySelector('textarea[name="message"]');
+                        var messageVal = messageEl ? messageEl.value.trim() : '';
+                        // If no prestations and message too short, block and ask user to describe the requested prestations
+                        if (prestationsVal === '' && messageVal.length < 10) {
+                            ev.preventDefault();
+                            if (messageEl) {
+                                messageEl.scrollIntoView({behavior: 'smooth', block: 'center'});
+                                messageEl.focus();
+                            }
+                            alert('Pour demander un devis, décrivez svp les prestations souhaitées (au moins 10 caractères) ou sélectionnez des prestations depuis le catalogue.');
+                            return false;
+                        }
+                    }
+                    } catch (e) {
+                        // en cas d'erreur JS, laisser le form soumettre pour ne pas bloquer l'utilisateur
+                        reviewForm.__submitGuardBusy = false;
+                        return true;
+                    }
+                }, {capture: true});
+            } catch (e) { /* silent */ }
+        })();
     })();
     </script>
     </main>
