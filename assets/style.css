@@ -404,7 +404,7 @@ main p {
 
 /* Ensure hero sections inside pages using .page-main-hero are centered like the FAQ */
 .page-main-hero > section:first-child,
-.public-page main > section:first-child {
+.public-page main > section:first-child:not(.contact-hero) {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -416,6 +416,25 @@ main p {
     text-transform: uppercase;
     letter-spacing: 0.06em;
     font-weight: 600;
+}
+
+/* Standard hero visual copied from index.html */
+.hero-standard {
+    background:
+        radial-gradient(1200px 280px at 10% -40%, rgba(255, 190, 46, 0.26), transparent 55%),
+        linear-gradient(135deg, var(--brand-navy) 0%, #17284d 48%, var(--brand-red) 100%);
+    color: var(--brand-white);
+    box-shadow: 0 16px 34px rgba(17, 26, 47, 0.28);
+    border-radius: 20px;
+    padding: 28px 20px;
+}
+
+/* Apply standard hero visual to targeted first sections (unless they have their own hero class) */
+.page-main-hero > section:first-child.hero-standard,
+.public-page main > section:first-child.hero-standard,
+.page-main-hero > section:first-child:not(.contact-hero),
+.public-page main > section:first-child:not(.contact-hero) {
+    /* ensure visual is applied when .hero-standard is present or when no specific hero exists */
 }
 
 .contact-hero-actions .cta-link-secondary {
