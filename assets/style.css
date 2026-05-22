@@ -400,7 +400,8 @@ main p {
 }
 
 /* Ensure hero sections inside pages using .page-main-hero are centered like the FAQ */
-.page-main-hero > section:first-child {
+.page-main-hero > section:first-child,
+.public-page main > section:first-child {
     display: flex;
     flex-direction: column;
     align-items: center;
