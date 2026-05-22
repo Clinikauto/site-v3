@@ -365,11 +365,12 @@ main p {
     margin-bottom: 26px;
     padding: 26px;
     border-radius: 22px;
+    /* Lightened background for better text contrast on contact page */
     background:
-        radial-gradient(1200px 280px at 10% -40%, rgba(255, 190, 46, 0.26), transparent 55%),
-        linear-gradient(135deg, #142444 0%, #1a315d 42%, #203c71 100%);
-    color: var(--brand-white);
-    box-shadow: 0 16px 34px rgba(17, 26, 47, 0.28);
+        radial-gradient(1200px 280px at 10% -40%, rgba(35,185,230,0.06), transparent 55%),
+        linear-gradient(180deg, rgba(247,251,255,1) 0%, rgba(238,244,251,1) 100%);
+    color: var(--brand-ink);
+    box-shadow: 0 10px 20px rgba(17, 26, 47, 0.06);
 }
 
 .contact-kicker {
@@ -377,18 +378,18 @@ main p {
     font-size: 0.78rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: rgba(255, 255, 255, 0.78);
+    color: var(--brand-red);
     font-weight: 700;
 }
 
 .contact-hero h1 {
     margin: 0;
-    color: var(--brand-white);
+    color: var(--brand-navy);
 }
 
 .contact-hero-lead {
     margin: 12px 0 0;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(39, 50, 68, 0.9);
     max-width: 760px;
 }
 
