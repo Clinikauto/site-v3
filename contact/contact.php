@@ -733,7 +733,7 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                             referrerpolicy="no-referrer-when-downgrade"></iframe>
                     </div>
                     <a href="https://www.google.com/maps/dir/?api=1&amp;destination=118+Clos+des+Teppes%2C+74950+Scionzier" class="cta-link cta-inline" target="_blank" rel="noopener noreferrer">Lancer le trajet GPS →</a>
-                    <p class="contact-trust-note"><span>3 repères clients</span> Devis clair, délais annoncés et suivi réel du dossier : vous savez toujours où en est votre voiture.</p>
+                    <p class="contact-trust-note"><span class="trust-highlight">3 repères clients</span> <span class="trust-desc">Devis clair, délais annoncés et suivi réel du dossier : vous savez toujours où en est votre voiture.</span></p>
                 </div>
             </div>
             <div class="contact-column contact-form-card">

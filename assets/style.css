@@ -521,6 +521,35 @@ main p {
     background: #f4f7fb;
 }
 
+.contact-trust-note {
+    font-size: 0.95rem;
+    color: #394955;
+}
+.contact-trust-note .trust-highlight {
+    display: inline-block;
+    background: linear-gradient(90deg, #fff4d6, #ffe08a);
+    color: var(--brand-navy);
+    font-weight: 800;
+    padding: 6px 10px;
+    border-radius: 10px;
+    box-shadow: 0 8px 22px rgba(35, 185, 230, 0.06);
+    transition: transform 0.32s ease, box-shadow 0.32s ease;
+    animation: trustPulse 4.5s ease-in-out infinite;
+}
+.contact-trust-note .trust-desc {
+    margin-left: 10px;
+    color: rgba(39,50,68,0.88);
+}
+.contact-trust-note:hover .trust-highlight {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(35, 185, 230, 0.12);
+}
+@keyframes trustPulse {
+    0% { transform: translateY(0); box-shadow: 0 6px 18px rgba(35,185,230,0.04); }
+    50% { transform: translateY(-3px); box-shadow: 0 16px 36px rgba(35,185,230,0.08); }
+    100% { transform: translateY(0); box-shadow: 0 6px 18px rgba(35,185,230,0.04); }
+}
+
 .map-embed iframe {
     display: block;
     width: 100%;
