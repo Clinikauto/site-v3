@@ -1,9 +1,20 @@
 <?php
 require_once dirname(__DIR__) . "/config.php";
 require_once dirname(__DIR__) . "/includes/catalog_store.php";
+require_once dirname(__DIR__) . "/includes/security.php";
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
+}
+
+// CSRF: init and validate POST (tolerated in local development)
+csrf_init();
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+    if (!csrf_validate_request() && !CATALOG_IS_LOCAL_RUNTIME) {
+        http_response_code(400);
+        echo 'Requête invalide (CSRF)';
+        exit;
+    }
 }
 
 $showAdminReturn = catalog_is_admin_session_active();
@@ -63,50 +74,7 @@ if (defined("COMPOSER_AUTOLOAD_PATH") && file_exists(COMPOSER_AUTOLOAD_PATH)) {
 
 function send_devis_email($destinataire, $safe_sender, $email_subject, $email_body)
 {
-    $smtp_ready =
-        defined("SMTP_ENABLED") && SMTP_ENABLED &&
-        class_exists("\\PHPMailer\\PHPMailer\\PHPMailer") &&
-        defined("SMTP_HOST") && SMTP_HOST !== "" &&
-        defined("SMTP_USERNAME") && SMTP_USERNAME !== "" &&
-        defined("SMTP_PASSWORD") && SMTP_PASSWORD !== "";
-
-    if ($smtp_ready) {
-        try {
-            $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-            $mail->isSMTP();
-            $mail->Host = SMTP_HOST;
-            $mail->Port = defined("SMTP_PORT") ? (int) SMTP_PORT : 587;
-            $mail->SMTPAuth = true;
-            $mail->Username = SMTP_USERNAME;
-            $mail->Password = SMTP_PASSWORD;
-
-            if (defined("SMTP_SECURE") && SMTP_SECURE !== "") {
-                $mail->SMTPSecure = SMTP_SECURE;
-            }
-
-            $mail->CharSet = "UTF-8";
-            $mail->setFrom(EMAIL_EXPEDITEUR, GARAGE_NOM);
-            $mail->addAddress($destinataire, GARAGE_NOM);
-            $mail->addReplyTo($safe_sender);
-            $mail->Subject = $email_subject;
-            $mail->Body = $email_body;
-            return $mail->send();
-        } catch (Exception $e) {
-            return false;
-        }
-    }
-
-    $headers =
-        "MIME-Version: 1.0\r\n" .
-        "Content-Type: text/plain; charset=UTF-8\r\n" .
-        "From: " . GARAGE_NOM . " <" . EMAIL_EXPEDITEUR . ">\r\n" .
-        "Reply-To: " . $safe_sender . "\r\n";
-
-    if (function_exists("mail")) {
-        return @mail($destinataire, $email_subject, $email_body, $headers);
-    }
-
-    return false;
+    return catalog_send_email($destinataire, $email_subject, $email_body, $safe_sender);
 }
 
 function contact_request_context($form_data)
@@ -616,7 +584,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             if ($form_data["customer_type"] === 'professional') {
                 $identityMessage = htmlspecialchars($form_data["nom"]) . " (contact: " . htmlspecialchars($form_data["prenom"]) . ")";
             }
-            $message = "Merci " . $identityMessage . ", votre demande de devis a bien été envoyée.";
+            $message = "Merci " . $identityMessage . ", votre demande a bien été enregistrée.";
+            if (!$email_sent) {
+                $message .= " Nous l'avons bien reçue, mais l'envoi de notification e-mail est temporairement indisponible.";
+            }
             if ($reservation_marked) {
                 $message .= " La pièce est maintenant marquée comme indisponible suite à la confirmation de l'acompte.";
             }
@@ -716,6 +687,7 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
         <?php echo json_encode($contactStructuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
     </script>
     <?php echo catalog_get_google_analytics_script(); ?>
+    <?php if (function_exists('csrf_print_meta_and_js')) { csrf_print_meta_and_js(); } ?>
 </head>
 <body class="public-page">
     <header>
@@ -737,13 +709,9 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
     </header>
     <main class="contact-page">
         <section class="contact-hero">
-            <p class="contact-kicker">Parlons de votre véhicule</p>
-            <h1>Contact Clinik Auto</h1>
-            <p class="contact-hero-lead">Décrivez votre besoin en 2 minutes. Notre équipe vous répond rapidement pour organiser un devis, un essai ou une intervention atelier.</p>
-            <div class="contact-hero-actions">
-                <a href="tel:0620185627" class="cta-link">Appeler maintenant</a>
-                <a href="../devis/devis.php" class="cta-link-secondary">Demander un devis en ligne</a>
-            </div>
+            <span class="hero-badge">⭐ Votre garage de confiance</span>
+            <h1>Garage automobile à Scionzier : révision, réparation et vente d'occasion</h1>
+            <p>Révision, entretien, réparation multimarque et vente de véhicules d'occasion à Scionzier (74950) — devis gratuit, réponse rapide.</p>
         </section>
 
         <div class="contact-layout">
@@ -764,6 +732,7 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                             referrerpolicy="no-referrer-when-downgrade"></iframe>
                     </div>
                     <a href="https://www.google.com/maps/dir/?api=1&amp;destination=118+Clos+des+Teppes%2C+74950+Scionzier" class="cta-link cta-inline" target="_blank" rel="noopener noreferrer">Lancer le trajet GPS →</a>
+                    <p class="contact-trust-note"><span>3 repères clients</span> Devis clair, délais annoncés et suivi réel du dossier : vous savez toujours où en est votre voiture.</p>
                 </div>
             </div>
             <div class="contact-column contact-form-card">
@@ -825,6 +794,7 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                         <?php foreach ($form_data as $key => $value): ?>
                             <input type="hidden" name="<?php echo e($key); ?>" value="<?php echo e($value); ?>">
                         <?php endforeach; ?>
+                        <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(csrf_get_token(), ENT_QUOTES, 'UTF-8') . '">'; ?>
                         <button type="submit" name="form_action" value="submit">Valider votre demande de devis →</button>
                         <button class="btn-secondary" type="submit" name="form_action" value="edit">Modifier les informations</button>
                     </form>
@@ -832,6 +802,7 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                 <?php else: ?>
                 <form method="post">
                     <input type="hidden" name="form_action" value="review">
+                    <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(csrf_get_token(), ENT_QUOTES, 'UTF-8') . '">'; ?>
                     <input type="hidden" name="contact_action" value="<?php echo e($form_data["contact_action"]); ?>">
                     <input type="hidden" name="annonce_id" value="<?php echo e($form_data["annonce_id"]); ?>">
                     <input type="hidden" name="annonce_type" value="<?php echo e($form_data["annonce_type"]); ?>">
