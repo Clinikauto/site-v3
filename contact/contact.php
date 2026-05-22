@@ -354,7 +354,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $form_action = $_POST["form_action"] ?? "review";
 
     foreach ($form_data as $key => $value) {
-        $form_data[$key] = trim($_POST[$key] ?? "");
+        $raw = $_POST[$key] ?? "";
+        switch ($key) {
+            case 'telephone':
+                $form_data[$key] = sanitize_phone($raw);
+                break;
+            case 'code_postal':
+                $form_data[$key] = sanitize_postal_code($raw);
+                break;
+            case 'date_essai':
+                $form_data[$key] = sanitize_text($raw);
+                break;
+            case 'heure':
+                $form_data[$key] = sanitize_text($raw);
+                break;
+            default:
+                $form_data[$key] = sanitize_text($raw);
+        }
     }
     $form_data["customer_type"] = contact_customer_type($form_data["customer_type"]);
 
@@ -558,7 +574,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             "Prestations: " . $form_data["prestations"] . "\n\n" .
             "Message:\n" . $form_data["message"] . "\n";
 
-        $safe_sender = preg_replace('/[\r\n]+/', '', $form_data["email"]);
+        $safe_sender = null;
+        if ($form_data["email"] !== "" && filter_var($form_data["email"], FILTER_VALIDATE_EMAIL)) {
+            $safe_sender = preg_replace('/[\r\n]+/', '', $form_data["email"]);
+        }
         if (!$dry_run_mode) {
             $email_sent = send_devis_email($destinataire, $safe_sender, $email_subject, $email_body);
         } else {
@@ -573,6 +592,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $conn = @new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, $dbPort);
             if (!$conn->connect_error) {
                 $conn->set_charset("utf8mb4");
+                // enforce allowed customer types
+                $form_data["customer_type"] = in_array($form_data["customer_type"], ['professional', 'individual'], true) ? $form_data["customer_type"] : 'individual';
+
+                // truncate fields to sensible limits to avoid DB errors
+                $nom = truncate_text($form_data["nom"], 100);
+                $prenom = truncate_text($form_data["prenom"], 100);
+                $adresse = truncate_text($form_data["adresse"], 255);
+                $code_postal = truncate_text($form_data["code_postal"], 20);
+                $ville = truncate_text($form_data["ville"], 100);
+                $email_db = truncate_text($form_data["email"], 150);
+                $telephone = truncate_text($form_data["telephone"], 40);
+                $immatriculation = truncate_text($form_data["immatriculation"], 32);
+                $sujet = truncate_text($form_data["sujet"], 150);
+                $prestations_db = truncate_text($form_data["prestations"], 1000);
+                $message_db = truncate_text($form_data["message"], 2000);
+
                 $stmt = $conn->prepare(
                     "INSERT INTO demandes_devis (customer_type, nom, prenom, adresse, postal_code, city, email, telephone, immatriculation, sujet, prestations, message) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                 );
@@ -581,17 +616,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $stmt->bind_param(
                         "ssssssssssss",
                         $form_data["customer_type"],
-                        $form_data["nom"],
-                        $form_data["prenom"],
-                        $form_data["adresse"],
-                        $form_data["code_postal"],
-                        $form_data["ville"],
-                        $form_data["email"],
-                        $form_data["telephone"],
-                        $form_data["immatriculation"],
-                        $form_data["sujet"],
-                        $form_data["prestations"],
-                        $form_data["message"]
+                        $nom,
+                        $prenom,
+                        $adresse,
+                        $code_postal,
+                        $ville,
+                        $email_db,
+                        $telephone,
+                        $immatriculation,
+                        $sujet,
+                        $prestations_db,
+                        $message_db
                     );
                     $db_saved = $stmt->execute();
                     $stmt->close();
@@ -707,6 +742,40 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 function e($value)
 {
     return htmlspecialchars($value ?? "", ENT_QUOTES, "UTF-8");
+}
+
+// Sanitization helpers
+function sanitize_text($v)
+{
+    $v = trim((string)($v ?? ''));
+    // remove any control characters
+    $v = preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $v);
+    return $v;
+}
+
+function sanitize_phone($v)
+{
+    $v = preg_replace('/[^0-9+\s().-]/', '', (string)$v);
+    return trim($v);
+}
+
+function sanitize_postal_code($v)
+{
+    return preg_replace('/[^0-9A-Za-z -]/', '', (string)$v);
+}
+
+function validate_date_iso($v)
+{
+    if (!is_string($v) || $v === '') return false;
+    $d = DateTimeImmutable::createFromFormat('Y-m-d', $v);
+    return $d && $d->format('Y-m-d') === $v;
+}
+
+function truncate_text($v, $max)
+{
+    $s = (string)($v ?? '');
+    if (mb_strlen($s) <= $max) return $s;
+    return mb_substr($s, 0, $max);
 }
 
 $virement_lock_mode = (
@@ -934,9 +1003,6 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                         <datalist id="contact-postal-city-list"></datalist>
                         <p class="form-helper" data-postal-city-status></p>
                     </div>
-                    <label>Email
-                        <input type="email" name="email" placeholder="votre@email.fr" value="<?php echo e($form_data["email"]); ?>" required>
-                    </label>
                     <label>Téléphone
                         <input type="tel" name="telephone" placeholder="06 12 34 56 78" value="<?php echo e($form_data["telephone"]); ?>" required>
                     </label>
@@ -991,7 +1057,7 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
                         </label>
                         <label>Heure souhaitée
                             <select id="heure_essai" name="heure">
-                                <option value="" disabled <?php echo $form_data['heure'] === '' ? 'selected' : ''; ?>>Choisissez un créneau…</option>
+                                <option value="" disabled <?php echo (isset($form_data['heure']) && $form_data['heure'] === '') ? 'selected' : ''; ?>>Choisissez un créneau…</option>
                             </select>
                         </label>
                     </div>
@@ -1058,7 +1124,7 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
             }
             heureSelect.appendChild(makeOption('', 'Choisissez un créneau…', true));
             daySlots.forEach(function(s){ heureSelect.appendChild(makeOption(s)); });
-            var prev = <?php echo json_encode($form_data['heure']); ?>;
+            var prev = <?php echo json_encode($form_data['heure'] ?? null); ?>;
             if (prev) { try { heureSelect.value = prev; } catch (e) {} }
         }
 
