@@ -411,6 +411,14 @@ main p {
     justify-content: center;
     text-align: center;
     padding: 24px 12px;
+    /* apply standard hero visual by default to first sections */
+    background:
+        radial-gradient(1200px 280px at 10% -40%, rgba(255, 190, 46, 0.26), transparent 55%),
+        linear-gradient(135deg, var(--brand-navy) 0%, #17284d 48%, var(--brand-red) 100%);
+    color: var(--brand-white);
+    box-shadow: 0 16px 34px rgba(17, 26, 47, 0.28);
+    border-radius: 20px;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.45);
 }
 .page-main-hero > section:first-child .hero-badge {
     text-transform: uppercase;
