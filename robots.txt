@@ -4,9 +4,6 @@ Disallow: /admin.php
 Disallow: /admin_gate.php
 Disallow: /google-oauth-setup.php
 Disallow: /politique-cookies.php
-Disallow: /test_diag.php
-Disallow: /test-limits.php
-Disallow: /tmp_seed_test.php
 Disallow: /data/
 Disallow: /includes/
 Disallow: /vendor/

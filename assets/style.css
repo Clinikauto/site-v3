@@ -399,6 +399,42 @@ main p {
     max-width: 760px;
 }
 
+/* RDV fields visibility controlled by JS/class, avoid inline styles */
+#rdv-fields { display: none; }
+#rdv-fields.rdv-visible { display: block; }
+
+/* Auto confirmation modal that reuses hero visual */
+.auto-confirm-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(17, 26, 47, 0.36);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 240ms ease-in-out;
+}
+.auto-confirm-modal__panel {
+    width: min(920px, calc(100% - 40px));
+    max-width: 920px;
+    background: linear-gradient(135deg, var(--brand-navy) 0%, #17284d 48%, var(--brand-red) 100%);
+    color: var(--brand-white);
+    padding: 28px 30px;
+    border-radius: 18px;
+    box-shadow: 0 28px 60px rgba(17, 26, 47, 0.36);
+    text-align: center;
+}
+.auto-confirm-modal__panel h2 {
+    margin-top: 10px;
+    margin-bottom: 8px;
+    font-size: 1.4rem;
+}
+.auto-confirm-modal__panel p {
+    margin: 0;
+    color: rgba(255,255,255,0.95);
+}
+
 .contact-hero-actions {
     display: flex;
     gap: 12px;

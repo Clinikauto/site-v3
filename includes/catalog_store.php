@@ -651,6 +651,24 @@ function catalog_devis_config_file_path()
     return dirname(__DIR__) . '/data/devis_config.json';
 }
 
+function catalog_devis_option_id_from_label($categoryId, $label)
+{
+    $seed = trim((string) $categoryId) . '|' . trim((string) $label);
+    return 'opt-' . substr(sha1($seed), 0, 12);
+}
+
+function catalog_devis_icon_library_default()
+{
+    return [
+        'Entretien' => ['🛠️', '🧰', '🔧', '🧴', '🛢️', '🪛', '🧽', '🧼'],
+        'Diagnostic' => ['🧪', '🔎', '🖥️', '📟', '📊', '✅', '☑️', '⚠️'],
+        'Mecanique' => ['⚙️', '🔩', '🪫', '🧱', '🦾', '🛞', '🛑', '🧲'],
+        'Electricite' => ['🔋', '💡', '🔌', '⚡', '🔦', '🧠', '📡', '🪫'],
+        'Vehicule' => ['🚗', '🚙', '🚐', '🚚', '🛻', '🏎️', '🚘', '🪝'],
+        'Confort' => ['❄️', '🌬️', '🌡️', '🧊', '☀️', '🪟', '🎛️', '🛋️']
+    ];
+}
+
 function catalog_devis_config_default()
 {
     return [
@@ -735,11 +753,13 @@ function catalog_devis_config_normalize($config)
             if (is_array($option)) {
                 $label = trim((string) ($option['label'] ?? ''));
                 $unavailable = !empty($option['unavailable_on_devis']);
-                $icon = trim((string) ($option['icon'] ?? ''));
+                $optionIcon = trim((string) ($option['icon'] ?? ''));
+                $optionId = trim((string) ($option['id'] ?? ''));
             } else {
                 $label = trim((string) $option);
                 $unavailable = false;
-                $icon = '';
+                $optionIcon = '';
+                $optionId = '';
             }
             
             if ($label === '') {
@@ -755,7 +775,8 @@ function catalog_devis_config_normalize($config)
             $options[] = [
                 'label' => $label,
                 'unavailable_on_devis' => $unavailable,
-                'icon' => $icon
+                'icon' => $optionIcon,
+                'id' => $optionId
             ];
         }
 
@@ -780,7 +801,7 @@ function catalog_devis_config_normalize($config)
     return ['categories' => $categories];
 }
 
-function catalog_devis_config_load()
+function catalog_devis_config_load_from_file()
 {
     $path = catalog_devis_config_file_path();
     if (!file_exists($path)) {
@@ -800,7 +821,7 @@ function catalog_devis_config_load()
     return catalog_devis_config_normalize($decoded);
 }
 
-function catalog_devis_config_save($config)
+function catalog_devis_config_write_file($config)
 {
     $path = catalog_devis_config_file_path();
     $dir = dirname($path);
@@ -808,13 +829,427 @@ function catalog_devis_config_save($config)
         @mkdir($dir, 0775, true);
     }
 
-    $normalized = catalog_devis_config_normalize(is_array($config) ? $config : []);
-    $payload = json_encode($normalized, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $payload = json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     if ($payload === false) {
         return false;
     }
 
     return @file_put_contents($path, $payload) !== false;
+}
+
+function catalog_devis_config_load_from_db($connection)
+{
+    $sql = 'SELECT c.category_id, c.title, c.icon, c.hidden_on_devis, c.sort_order,
+                   o.option_id, o.label AS option_label, o.icon AS option_icon, o.unavailable_on_devis, o.sort_order AS option_sort
+            FROM catalog_devis_categories c
+            LEFT JOIN catalog_devis_options o
+                ON o.category_id = c.category_id
+               AND o.is_archived = 0
+            WHERE c.is_archived = 0
+            ORDER BY c.sort_order ASC, c.id ASC, o.sort_order ASC, o.id ASC';
+
+    $result = $connection->query($sql);
+    if (!($result instanceof mysqli_result)) {
+        return catalog_devis_config_default();
+    }
+
+    $categories = [];
+    while ($row = $result->fetch_assoc()) {
+        $categoryId = trim((string) ($row['category_id'] ?? ''));
+        if ($categoryId === '') {
+            continue;
+        }
+
+        if (!isset($categories[$categoryId])) {
+            $categories[$categoryId] = [
+                'id' => $categoryId,
+                'title' => trim((string) ($row['title'] ?? '')),
+                'icon' => trim((string) ($row['icon'] ?? '')),
+                'hidden_on_devis' => !empty($row['hidden_on_devis']),
+                'options' => []
+            ];
+        }
+
+        $optionId = trim((string) ($row['option_id'] ?? ''));
+        $optionLabel = trim((string) ($row['option_label'] ?? ''));
+        if ($optionId === '' || $optionLabel === '') {
+            continue;
+        }
+
+        $categories[$categoryId]['options'][] = [
+            'id' => $optionId,
+            'label' => $optionLabel,
+            'icon' => trim((string) ($row['option_icon'] ?? '')),
+            'unavailable_on_devis' => !empty($row['unavailable_on_devis'])
+        ];
+    }
+    $result->free();
+
+    return catalog_devis_config_normalize(['categories' => array_values($categories)]);
+}
+
+function catalog_devis_config_save_to_db($connection, $normalized, $archiveMissing = true)
+{
+    $categories = (array) ($normalized['categories'] ?? []);
+    if (empty($categories)) {
+        return false;
+    }
+
+    $connection->begin_transaction();
+    try {
+        $activeCategoryIds = [];
+        $activeOptionIds = [];
+
+        foreach ($categories as $categoryIndex => $category) {
+            if (!is_array($category)) {
+                continue;
+            }
+
+            $categoryId = trim((string) ($category['id'] ?? ''));
+            $title = trim((string) ($category['title'] ?? ''));
+            if ($categoryId === '' || $title === '') {
+                continue;
+            }
+
+            $activeCategoryIds[] = $categoryId;
+            $icon = trim((string) ($category['icon'] ?? ''));
+            $hidden = !empty($category['hidden_on_devis']) ? 1 : 0;
+            $sortOrder = (int) $categoryIndex;
+
+            $stmtCategory = $connection->prepare(
+                'INSERT INTO catalog_devis_categories (category_id, title, icon, hidden_on_devis, sort_order, is_archived) VALUES (?, ?, ?, ?, ?, 0)
+                 ON DUPLICATE KEY UPDATE title = VALUES(title), icon = VALUES(icon), hidden_on_devis = VALUES(hidden_on_devis), sort_order = VALUES(sort_order), is_archived = 0, updated_at = CURRENT_TIMESTAMP'
+            );
+            if (!$stmtCategory) {
+                throw new Exception('Prepare category failed');
+            }
+            $stmtCategory->bind_param('sssii', $categoryId, $title, $icon, $hidden, $sortOrder);
+            $stmtCategory->execute();
+            $stmtCategory->close();
+
+            $usedOptionIdsInCategory = [];
+            foreach ((array) ($category['options'] ?? []) as $optionIndex => $option) {
+                if (!is_array($option)) {
+                    continue;
+                }
+
+                $label = trim((string) ($option['label'] ?? ''));
+                if ($label === '') {
+                    continue;
+                }
+
+                $optionId = trim((string) ($option['id'] ?? ''));
+                if ($optionId === '') {
+                    $optionId = catalog_devis_option_id_from_label($categoryId, $label);
+                }
+                while (isset($usedOptionIdsInCategory[$optionId])) {
+                    $optionId .= '-' . substr(sha1((string) mt_rand()), 0, 4);
+                }
+                $usedOptionIdsInCategory[$optionId] = true;
+                $activeOptionIds[] = $optionId;
+
+                $optionIcon = trim((string) ($option['icon'] ?? ''));
+                $optionUnavailable = !empty($option['unavailable_on_devis']) ? 1 : 0;
+                $optionSortOrder = (int) $optionIndex;
+
+                $stmtOption = $connection->prepare(
+                    'INSERT INTO catalog_devis_options (option_id, category_id, label, icon, unavailable_on_devis, sort_order, is_archived) VALUES (?, ?, ?, ?, ?, ?, 0)
+                     ON DUPLICATE KEY UPDATE category_id = VALUES(category_id), label = VALUES(label), icon = VALUES(icon), unavailable_on_devis = VALUES(unavailable_on_devis), sort_order = VALUES(sort_order), is_archived = 0, updated_at = CURRENT_TIMESTAMP'
+                );
+                if (!$stmtOption) {
+                    throw new Exception('Prepare option failed');
+                }
+                $stmtOption->bind_param('ssssii', $optionId, $categoryId, $label, $optionIcon, $optionUnavailable, $optionSortOrder);
+                $stmtOption->execute();
+                $stmtOption->close();
+            }
+        }
+
+        if ($archiveMissing) {
+            if (!empty($activeCategoryIds)) {
+                // Use prepared statements to avoid SQL injection for IN lists
+                $placeholders = implode(',', array_fill(0, count($activeCategoryIds), '?'));
+                $sqlCats = "UPDATE catalog_devis_categories SET is_archived = 1, updated_at = CURRENT_TIMESTAMP WHERE category_id NOT IN ($placeholders)";
+                $stmtCats = $connection->prepare($sqlCats);
+                if (!$stmtCats) {
+                    throw new Exception('Prepare failed for categories archive');
+                }
+                $types = str_repeat('s', count($activeCategoryIds));
+                $params = array_merge([$types], $activeCategoryIds);
+                $refs = [];
+                foreach ($params as $k => $v) { $refs[$k] = &$params[$k]; }
+                call_user_func_array([$stmtCats, 'bind_param'], $refs);
+                $stmtCats->execute();
+                $stmtCats->close();
+
+                $sqlOpts = "UPDATE catalog_devis_options SET is_archived = 1, updated_at = CURRENT_TIMESTAMP WHERE category_id NOT IN ($placeholders)";
+                $stmtOpts = $connection->prepare($sqlOpts);
+                if (!$stmtOpts) {
+                    throw new Exception('Prepare failed for options archive');
+                }
+                // reuse same params
+                $refs2 = [];
+                foreach ($params as $k => $v) { $refs2[$k] = &$params[$k]; }
+                call_user_func_array([$stmtOpts, 'bind_param'], $refs2);
+                $stmtOpts->execute();
+                $stmtOpts->close();
+            } else {
+                $connection->query('UPDATE catalog_devis_categories SET is_archived = 1, updated_at = CURRENT_TIMESTAMP');
+                $connection->query('UPDATE catalog_devis_options SET is_archived = 1, updated_at = CURRENT_TIMESTAMP');
+            }
+
+            if (!empty($activeOptionIds)) {
+                // Prepared statement for option_id NOT IN (...) safely
+                $placeholdersOpt = implode(',', array_fill(0, count($activeOptionIds), '?'));
+                $sqlOpt = "UPDATE catalog_devis_options SET is_archived = 1, updated_at = CURRENT_TIMESTAMP WHERE option_id NOT IN ($placeholdersOpt)";
+                $stmtOpt = $connection->prepare($sqlOpt);
+                if (!$stmtOpt) {
+                    throw new Exception('Prepare failed for option_id archive');
+                }
+                $typesOpt = str_repeat('s', count($activeOptionIds));
+                $paramsOpt = array_merge([$typesOpt], $activeOptionIds);
+                $refsOpt = [];
+                foreach ($paramsOpt as $k => $v) { $refsOpt[$k] = &$paramsOpt[$k]; }
+                call_user_func_array([$stmtOpt, 'bind_param'], $refsOpt);
+                $stmtOpt->execute();
+                $stmtOpt->close();
+            } else {
+                $connection->query('UPDATE catalog_devis_options SET is_archived = 1, updated_at = CURRENT_TIMESTAMP');
+            }
+        }
+
+        $connection->commit();
+        return true;
+    } catch (Exception $e) {
+        $connection->rollback();
+        return false;
+    }
+}
+
+function catalog_devis_archived_options_by_category()
+{
+    $connection = catalog_db_connection();
+    if (!($connection instanceof mysqli) || !catalog_db_has_table($connection, 'catalog_devis_options')) {
+        return [];
+    }
+
+    $result = $connection->query('SELECT option_id, category_id, label, icon, unavailable_on_devis FROM catalog_devis_options WHERE is_archived = 1 ORDER BY category_id ASC, label ASC');
+    if (!($result instanceof mysqli_result)) {
+        return [];
+    }
+
+    $map = [];
+    while ($row = $result->fetch_assoc()) {
+        $categoryId = trim((string) ($row['category_id'] ?? ''));
+        $optionId = trim((string) ($row['option_id'] ?? ''));
+        $label = trim((string) ($row['label'] ?? ''));
+        if ($categoryId === '' || $optionId === '' || $label === '') {
+            continue;
+        }
+
+        if (!isset($map[$categoryId])) {
+            $map[$categoryId] = [];
+        }
+        $map[$categoryId][] = [
+            'id' => $optionId,
+            'label' => $label,
+            'icon' => trim((string) ($row['icon'] ?? '')),
+            'unavailable_on_devis' => !empty($row['unavailable_on_devis'])
+        ];
+    }
+    $result->free();
+
+    return $map;
+}
+
+function catalog_devis_restore_option($categoryId, $optionId)
+{
+    $connection = catalog_db_connection();
+    if (!($connection instanceof mysqli) || !catalog_db_has_table($connection, 'catalog_devis_options')) {
+        return false;
+    }
+
+    $categoryId = trim((string) $categoryId);
+    $optionId = trim((string) $optionId);
+    if ($categoryId === '' || $optionId === '') {
+        return false;
+    }
+
+    $stmtOrder = $connection->prepare('SELECT COALESCE(MAX(sort_order), -1) + 1 AS next_sort FROM catalog_devis_options WHERE category_id = ? AND is_archived = 0');
+    if (!$stmtOrder) {
+        return false;
+    }
+    $stmtOrder->bind_param('s', $categoryId);
+    $stmtOrder->execute();
+    $orderResult = $stmtOrder->get_result();
+    $row = $orderResult ? $orderResult->fetch_assoc() : null;
+    $nextSort = (int) ($row['next_sort'] ?? 0);
+    $stmtOrder->close();
+
+    $stmtRestore = $connection->prepare('UPDATE catalog_devis_options SET category_id = ?, is_archived = 0, sort_order = ?, updated_at = CURRENT_TIMESTAMP WHERE option_id = ?');
+    if (!$stmtRestore) {
+        return false;
+    }
+    $stmtRestore->bind_param('sis', $categoryId, $nextSort, $optionId);
+    $stmtRestore->execute();
+    $affected = $stmtRestore->affected_rows;
+    $stmtRestore->close();
+
+    return $affected >= 0;
+}
+
+function catalog_devis_icon_library_load()
+{
+    $defaults = catalog_devis_icon_library_default();
+    $connection = catalog_db_connection();
+    if (!($connection instanceof mysqli)) {
+        return $defaults;
+    }
+
+    $candidateTables = [
+        'catalog_icon_library',
+        'catalog_icons',
+        'devis_icon_library',
+        'devis_icons',
+        'icon_library',
+        'icons_library',
+        'icons'
+    ];
+
+    $iconColumnCandidates = ['icon_value', 'icon', 'emoji', 'symbol', 'value', 'glyph'];
+    $typeColumnCandidates = ['icon_type', 'type', 'category', 'icon_category', 'group_name', 'groupe', 'famille'];
+    $stateColumnCandidates = ['is_active', 'status'];
+    $orderColumnCandidates = ['sort_order', 'position', 'display_order', 'ordre', 'id'];
+
+    foreach ($candidateTables as $table) {
+        if (!catalog_db_has_table($connection, $table)) {
+            continue;
+        }
+
+        $iconColumn = '';
+        foreach ($iconColumnCandidates as $candidate) {
+            if (catalog_db_has_column($connection, $table, $candidate)) {
+                $iconColumn = $candidate;
+                break;
+            }
+        }
+        if ($iconColumn === '') {
+            continue;
+        }
+
+        $typeColumn = '';
+        foreach ($typeColumnCandidates as $candidate) {
+            if (catalog_db_has_column($connection, $table, $candidate)) {
+                $typeColumn = $candidate;
+                break;
+            }
+        }
+
+        $stateColumn = '';
+        foreach ($stateColumnCandidates as $candidate) {
+            if (catalog_db_has_column($connection, $table, $candidate)) {
+                $stateColumn = $candidate;
+                break;
+            }
+        }
+
+        $orderColumn = '';
+        foreach ($orderColumnCandidates as $candidate) {
+            if (catalog_db_has_column($connection, $table, $candidate)) {
+                $orderColumn = $candidate;
+                break;
+            }
+        }
+
+        $sql = "SELECT `{$iconColumn}` AS icon_value";
+        if ($typeColumn !== '') {
+            $sql .= ", `{$typeColumn}` AS icon_type";
+        }
+        $sql .= " FROM `{$table}`";
+
+        if ($stateColumn === 'is_active') {
+            $sql .= ' WHERE is_active = 1';
+        } elseif ($stateColumn === 'status') {
+            $sql .= ' WHERE status = 1';
+        }
+
+        if ($orderColumn !== '') {
+            $sql .= " ORDER BY `{$orderColumn}` ASC";
+        }
+
+        $result = $connection->query($sql);
+        if (!($result instanceof mysqli_result)) {
+            continue;
+        }
+
+        $groups = [];
+        while ($row = $result->fetch_assoc()) {
+            $icon = trim((string) ($row['icon_value'] ?? ''));
+            if ($icon === '') {
+                continue;
+            }
+            $type = trim((string) ($row['icon_type'] ?? ''));
+            if ($type === '') {
+                $type = 'Divers';
+            }
+            if (!isset($groups[$type])) {
+                $groups[$type] = [];
+            }
+            $groups[$type][] = $icon;
+        }
+        $result->free();
+
+        if (!empty($groups)) {
+            foreach ($groups as $type => $icons) {
+                $groups[$type] = array_values(array_unique($icons));
+            }
+            return $groups;
+        }
+    }
+
+    return $defaults;
+}
+
+function catalog_devis_config_load()
+{
+    $fileConfig = catalog_devis_config_load_from_file();
+    $connection = catalog_db_connection();
+
+    if (!($connection instanceof mysqli) || !catalog_db_has_table($connection, 'catalog_devis_categories') || !catalog_db_has_table($connection, 'catalog_devis_options')) {
+        return $fileConfig;
+    }
+
+    $countResult = $connection->query('SELECT COUNT(*) AS total_active FROM catalog_devis_categories WHERE is_archived = 0');
+    $hasActiveData = false;
+    if ($countResult instanceof mysqli_result) {
+        $row = $countResult->fetch_assoc();
+        $hasActiveData = ((int) ($row['total_active'] ?? 0)) > 0;
+        $countResult->free();
+    }
+
+    if (!$hasActiveData) {
+        $bootstrap = catalog_devis_config_normalize($fileConfig);
+        // Premier bootstrap: integration non destructive vers la DB.
+        // On n archive pas les enregistrements deja presents hors payload pour eviter toute perte au deploiement.
+        catalog_devis_config_save_to_db($connection, $bootstrap, false);
+        return $bootstrap;
+    }
+
+    return catalog_devis_config_load_from_db($connection);
+}
+
+function catalog_devis_config_save($config)
+{
+    $normalized = catalog_devis_config_normalize(is_array($config) ? $config : []);
+
+    $connection = catalog_db_connection();
+    if ($connection instanceof mysqli && catalog_db_has_table($connection, 'catalog_devis_categories') && catalog_db_has_table($connection, 'catalog_devis_options')) {
+        if (!catalog_devis_config_save_to_db($connection, $normalized)) {
+            return false;
+        }
+    }
+
+    return catalog_devis_config_write_file($normalized);
 }
 
 function catalog_db_has_column($connection, $table, $column)
@@ -823,6 +1258,21 @@ function catalog_db_has_column($connection, $table, $column)
     $column = $connection->real_escape_string($column);
     $result = $connection->query("SHOW COLUMNS FROM `{$table}` LIKE '{$column}'");
     if (!$result) {
+        return false;
+    }
+    $exists = $result->num_rows > 0;
+    $result->free();
+    return $exists;
+}
+
+function catalog_db_has_table($connection, $table)
+{
+    if (!($connection instanceof mysqli)) {
+        return false;
+    }
+    $table = $connection->real_escape_string((string) $table);
+    $result = $connection->query("SHOW TABLES LIKE '{$table}'");
+    if (!($result instanceof mysqli_result)) {
         return false;
     }
     $exists = $result->num_rows > 0;
@@ -1327,6 +1777,147 @@ function catalog_db_apply_migrations($connection)
         $connection->query("ALTER TABLE demandes_devis ADD COLUMN city VARCHAR(160) NOT NULL DEFAULT '' AFTER postal_code");
     }
 
+    $connection->query('CREATE TABLE IF NOT EXISTS catalog_devis_categories (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        category_id VARCHAR(120) NOT NULL,
+        title VARCHAR(191) NOT NULL,
+        icon VARCHAR(32) NOT NULL DEFAULT "",
+        hidden_on_devis TINYINT(1) NOT NULL DEFAULT 0,
+        sort_order INT NOT NULL DEFAULT 0,
+        is_archived TINYINT(1) NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_catalog_devis_category_id (category_id),
+        KEY idx_catalog_devis_category_archived (is_archived, sort_order)
+    )');
+    if (!catalog_db_has_column($connection, 'catalog_devis_categories', 'category_id')) {
+        $connection->query("ALTER TABLE catalog_devis_categories ADD COLUMN category_id VARCHAR(120) NOT NULL DEFAULT '' AFTER id");
+    }
+    if (!catalog_db_has_column($connection, 'catalog_devis_categories', 'icon')) {
+        $connection->query("ALTER TABLE catalog_devis_categories ADD COLUMN icon VARCHAR(32) NOT NULL DEFAULT '' AFTER title");
+    }
+    if (!catalog_db_has_column($connection, 'catalog_devis_categories', 'hidden_on_devis')) {
+        $connection->query('ALTER TABLE catalog_devis_categories ADD COLUMN hidden_on_devis TINYINT(1) NOT NULL DEFAULT 0 AFTER icon');
+    }
+    if (!catalog_db_has_column($connection, 'catalog_devis_categories', 'sort_order')) {
+        $connection->query('ALTER TABLE catalog_devis_categories ADD COLUMN sort_order INT NOT NULL DEFAULT 0 AFTER hidden_on_devis');
+    }
+    if (!catalog_db_has_column($connection, 'catalog_devis_categories', 'is_archived')) {
+        $connection->query('ALTER TABLE catalog_devis_categories ADD COLUMN is_archived TINYINT(1) NOT NULL DEFAULT 0 AFTER sort_order');
+        if (catalog_db_has_column($connection, 'catalog_devis_categories', 'status')) {
+            $connection->query('UPDATE catalog_devis_categories SET is_archived = IF(status = 1, 0, 1)');
+        }
+    }
+    $connection->query('ALTER TABLE catalog_devis_categories ADD UNIQUE KEY uq_catalog_devis_category_id (category_id)');
+
+    $connection->query('CREATE TABLE IF NOT EXISTS catalog_devis_options (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        option_id VARCHAR(120) NOT NULL,
+        category_id VARCHAR(120) NOT NULL,
+        label VARCHAR(255) NOT NULL,
+        icon VARCHAR(32) NOT NULL DEFAULT "",
+        unavailable_on_devis TINYINT(1) NOT NULL DEFAULT 0,
+        sort_order INT NOT NULL DEFAULT 0,
+        is_archived TINYINT(1) NOT NULL DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_catalog_devis_option_id (option_id),
+        KEY idx_catalog_devis_option_category (category_id, is_archived, sort_order)
+    )');
+    if (!catalog_db_has_column($connection, 'catalog_devis_options', 'option_id')) {
+        $connection->query("ALTER TABLE catalog_devis_options ADD COLUMN option_id VARCHAR(120) NOT NULL DEFAULT '' AFTER id");
+    }
+    if (!catalog_db_has_column($connection, 'catalog_devis_options', 'category_id')) {
+        $connection->query("ALTER TABLE catalog_devis_options ADD COLUMN category_id VARCHAR(120) NOT NULL DEFAULT '' AFTER option_id");
+    }
+    if (!catalog_db_has_column($connection, 'catalog_devis_options', 'label')) {
+        $connection->query("ALTER TABLE catalog_devis_options ADD COLUMN label VARCHAR(255) NOT NULL DEFAULT '' AFTER category_id");
+    }
+    if (!catalog_db_has_column($connection, 'catalog_devis_options', 'icon')) {
+        $connection->query("ALTER TABLE catalog_devis_options ADD COLUMN icon VARCHAR(32) NOT NULL DEFAULT '' AFTER label");
+    }
+    if (!catalog_db_has_column($connection, 'catalog_devis_options', 'unavailable_on_devis')) {
+        $connection->query('ALTER TABLE catalog_devis_options ADD COLUMN unavailable_on_devis TINYINT(1) NOT NULL DEFAULT 0 AFTER icon');
+    }
+    if (!catalog_db_has_column($connection, 'catalog_devis_options', 'sort_order')) {
+        $connection->query('ALTER TABLE catalog_devis_options ADD COLUMN sort_order INT NOT NULL DEFAULT 0 AFTER unavailable_on_devis');
+    }
+    if (!catalog_db_has_column($connection, 'catalog_devis_options', 'is_archived')) {
+        $connection->query('ALTER TABLE catalog_devis_options ADD COLUMN is_archived TINYINT(1) NOT NULL DEFAULT 0 AFTER sort_order');
+        if (catalog_db_has_column($connection, 'catalog_devis_options', 'status')) {
+            $connection->query('UPDATE catalog_devis_options SET is_archived = IF(status = 1, 0, 1)');
+        }
+    }
+    $connection->query('ALTER TABLE catalog_devis_options ADD UNIQUE KEY uq_catalog_devis_option_id (option_id)');
+
+    $connection->query('CREATE TABLE IF NOT EXISTS catalog_icon_library (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        icon_type VARCHAR(80) NOT NULL,
+        icon_value VARCHAR(32) NOT NULL,
+        icon_label VARCHAR(120) NOT NULL DEFAULT "",
+        sort_order INT NOT NULL DEFAULT 0,
+        is_active TINYINT(1) NOT NULL DEFAULT 1,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_catalog_icon_library (icon_type, icon_value),
+        KEY idx_catalog_icon_library_active (is_active, sort_order)
+    )');
+    if (!catalog_db_has_column($connection, 'catalog_icon_library', 'icon_type')) {
+        $connection->query("ALTER TABLE catalog_icon_library ADD COLUMN icon_type VARCHAR(80) NOT NULL DEFAULT 'Divers' AFTER id");
+    }
+    if (!catalog_db_has_column($connection, 'catalog_icon_library', 'icon_value')) {
+        if (catalog_db_has_column($connection, 'catalog_icon_library', 'icon')) {
+            $connection->query("ALTER TABLE catalog_icon_library ADD COLUMN icon_value VARCHAR(32) NOT NULL DEFAULT '' AFTER icon_type");
+            $connection->query('UPDATE catalog_icon_library SET icon_value = icon WHERE icon_value = ""');
+        } elseif (catalog_db_has_column($connection, 'catalog_icon_library', 'emoji')) {
+            $connection->query("ALTER TABLE catalog_icon_library ADD COLUMN icon_value VARCHAR(32) NOT NULL DEFAULT '' AFTER icon_type");
+            $connection->query('UPDATE catalog_icon_library SET icon_value = emoji WHERE icon_value = ""');
+        } else {
+            $connection->query("ALTER TABLE catalog_icon_library ADD COLUMN icon_value VARCHAR(32) NOT NULL DEFAULT '' AFTER icon_type");
+        }
+    }
+    if (!catalog_db_has_column($connection, 'catalog_icon_library', 'icon_label')) {
+        $connection->query("ALTER TABLE catalog_icon_library ADD COLUMN icon_label VARCHAR(120) NOT NULL DEFAULT '' AFTER icon_value");
+    }
+    if (!catalog_db_has_column($connection, 'catalog_icon_library', 'sort_order')) {
+        $connection->query('ALTER TABLE catalog_icon_library ADD COLUMN sort_order INT NOT NULL DEFAULT 0 AFTER icon_label');
+    }
+    if (!catalog_db_has_column($connection, 'catalog_icon_library', 'is_active')) {
+        $connection->query('ALTER TABLE catalog_icon_library ADD COLUMN is_active TINYINT(1) NOT NULL DEFAULT 1 AFTER sort_order');
+        if (catalog_db_has_column($connection, 'catalog_icon_library', 'status')) {
+            $connection->query('UPDATE catalog_icon_library SET is_active = IF(status = 1, 1, 0)');
+        }
+    }
+
+    $iconSeedCount = 0;
+    $iconSeedResult = $connection->query('SELECT COUNT(*) AS total FROM catalog_icon_library');
+    if ($iconSeedResult instanceof mysqli_result) {
+        $iconSeedRow = $iconSeedResult->fetch_assoc();
+        $iconSeedCount = (int) ($iconSeedRow['total'] ?? 0);
+        $iconSeedResult->free();
+    }
+    if ($iconSeedCount === 0) {
+        $iconLibrary = catalog_devis_icon_library_default();
+        $seedPosition = 0;
+        foreach ($iconLibrary as $type => $icons) {
+            foreach ((array) $icons as $iconValue) {
+                $iconValue = trim((string) $iconValue);
+                if ($iconValue === '') {
+                    continue;
+                }
+                $stmt = $connection->prepare('INSERT IGNORE INTO catalog_icon_library (icon_type, icon_value, icon_label, sort_order, is_active) VALUES (?, ?, ?, ?, 1)');
+                if ($stmt) {
+                    $iconLabel = '';
+                    $sortOrder = $seedPosition;
+                    $stmt->bind_param('sssi', $type, $iconValue, $iconLabel, $sortOrder);
+                    $stmt->execute();
+                    $stmt->close();
+                }
+                $seedPosition += 1;
+            }
+        }
+    }
+
     $connection->query('CREATE TABLE IF NOT EXISTS postal_code_reference (
         id INT AUTO_INCREMENT PRIMARY KEY,
         insee_code VARCHAR(10) NOT NULL DEFAULT "",
@@ -1367,10 +1958,60 @@ function catalog_db_connection()
     }
 
     mysqli_report(MYSQLI_REPORT_OFF);
+    $dbHost = (string) DB_HOST;
     $dbPort = defined('DB_PORT') ? (int) DB_PORT : 3306;
-    $candidate = @new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME, $dbPort);
-    if ($candidate->connect_error) {
-        catalog_set_runtime_error('Connexion base de donnees impossible: ' . $candidate->connect_error);
+    $dbSocket = defined('DB_SOCKET') ? trim((string) DB_SOCKET) : '';
+
+    $attempts = [];
+    $attempts[] = ['host' => $dbHost, 'port' => $dbPort, 'socket' => $dbSocket, 'label' => 'config'];
+
+    // Sur certains mutualises (o2switch), le TCP peut echouer alors que le socket local fonctionne.
+    $defaultSocket = trim((string) ini_get('mysqli.default_socket'));
+    $attempts[] = ['host' => 'localhost', 'port' => 0, 'socket' => '', 'label' => 'localhost-auto-socket'];
+    if ($defaultSocket !== '') {
+        $attempts[] = ['host' => 'localhost', 'port' => 0, 'socket' => $defaultSocket, 'label' => 'localhost-ini-socket'];
+    }
+    $attempts[] = ['host' => 'localhost', 'port' => 0, 'socket' => '/var/lib/mysql/mysql.sock', 'label' => 'localhost-varlib-socket'];
+    $attempts[] = ['host' => 'localhost', 'port' => 0, 'socket' => '/var/run/mysqld/mysqld.sock', 'label' => 'localhost-varrun-socket'];
+    $attempts[] = ['host' => 'localhost', 'port' => 0, 'socket' => '/tmp/mysql.sock', 'label' => 'localhost-tmp-socket'];
+    $attempts[] = ['host' => '127.0.0.1', 'port' => $dbPort > 0 ? $dbPort : 3306, 'socket' => '', 'label' => 'tcp-loopback'];
+
+    $candidate = null;
+    $errors = [];
+
+    foreach ($attempts as $attempt) {
+        $mysqli = mysqli_init();
+        if (!$mysqli) {
+            $errors[] = $attempt['label'] . ': mysqli_init failed';
+            continue;
+        }
+
+        @mysqli_options($mysqli, MYSQLI_OPT_CONNECT_TIMEOUT, 5);
+        if (defined('MYSQLI_OPT_READ_TIMEOUT')) {
+            @mysqli_options($mysqli, MYSQLI_OPT_READ_TIMEOUT, 5);
+        }
+
+        $connected = @mysqli_real_connect(
+            $mysqli,
+            (string) $attempt['host'],
+            (string) DB_USER,
+            (string) DB_PASS,
+            (string) DB_NAME,
+            (int) $attempt['port'],
+            (string) $attempt['socket']
+        );
+
+        if ($connected) {
+            $candidate = $mysqli;
+            break;
+        }
+
+        $errors[] = $attempt['label'] . ': ' . mysqli_connect_error();
+        @mysqli_close($mysqli);
+    }
+
+    if (!$candidate instanceof mysqli) {
+        catalog_set_runtime_error('Connexion base de donnees impossible: ' . implode(' | ', $errors));
         $connection = null;
         return $connection;
     }
@@ -1787,12 +2428,23 @@ function catalog_send_email($to, $subject, $body, $replyTo = '')
         require_once COMPOSER_AUTOLOAD_PATH;
     }
 
+    $smtpPassword = defined('SMTP_PASSWORD') ? preg_replace('/\s+/', '', (string) SMTP_PASSWORD) : '';
+    $emailLogDir = dirname(__DIR__) . '/email-logs';
+    if (!is_dir($emailLogDir)) {
+        @mkdir($emailLogDir, 0777, true);
+    }
+
+    $smtp_log = static function ($message) use ($emailLogDir) {
+        $line = '[' . date('Y-m-d H:i:s') . '] ' . $message . "\n";
+        @file_put_contents($emailLogDir . '/smtp-error.log', $line, FILE_APPEND | LOCK_EX);
+    };
+
     $smtp_ready =
         defined('SMTP_ENABLED') && SMTP_ENABLED &&
         class_exists('\\PHPMailer\\PHPMailer\\PHPMailer') &&
         defined('SMTP_HOST') && SMTP_HOST !== '' &&
         defined('SMTP_USERNAME') && SMTP_USERNAME !== '' &&
-        defined('SMTP_PASSWORD') && SMTP_PASSWORD !== '';
+        $smtpPassword !== '';
 
     if ($smtp_ready) {
         try {
@@ -1802,7 +2454,7 @@ function catalog_send_email($to, $subject, $body, $replyTo = '')
             $mail->Port = defined('SMTP_PORT') ? (int) SMTP_PORT : 587;
             $mail->SMTPAuth = true;
             $mail->Username = SMTP_USERNAME;
-            $mail->Password = SMTP_PASSWORD;
+            $mail->Password = $smtpPassword;
             if (defined('SMTP_SECURE') && SMTP_SECURE !== '') {
                 $mail->SMTPSecure = SMTP_SECURE;
             }
@@ -1816,8 +2468,20 @@ function catalog_send_email($to, $subject, $body, $replyTo = '')
             $mail->Body = $body;
             return $mail->send();
         } catch (Exception $e) {
+            $smtp_log('PHPMailer error: ' . $e->getMessage());
             return false;
         }
+    }
+
+    // En production, si SMTP est explicitement active mais non pret, ne pas basculer silencieusement sur mail().
+    if (defined('SMTP_ENABLED') && SMTP_ENABLED) {
+        $smtp_log(
+            'SMTP enabled but not ready: host=' . (defined('SMTP_HOST') ? (string) SMTP_HOST : '[undef]') .
+            ', username=' . (defined('SMTP_USERNAME') ? (string) SMTP_USERNAME : '[undef]') .
+            ', password_len=' . strlen($smtpPassword) .
+            ', phpmailer=' . (class_exists('\\PHPMailer\\PHPMailer\\PHPMailer') ? 'yes' : 'no')
+        );
+        return false;
     }
 
     if (!function_exists('mail')) {

@@ -13,10 +13,6 @@ $items = catalog_all_items('vehicle');
 $selectedId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $selected = $selectedId > 0 ? catalog_find_item($selectedId, 'vehicle') : null;
 
-if (!$selected && !empty($items)) {
-    $selected = $items[0];
-}
-
 $vehicleListItems = [];
 foreach (array_slice($items, 0, 12) as $index => $item) {
     $vehicleListItems[] = [
@@ -100,6 +96,7 @@ $occasionStructuredData = [
     <script type="application/ld+json">
         <?php echo json_encode($occasionStructuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
     </script>
+    <?php if (function_exists('csrf_print_meta_and_js')) { csrf_print_meta_and_js(); } ?>
 </head>
 <body class="public-page">
     <header>
@@ -144,7 +141,7 @@ $occasionStructuredData = [
                                 <span class="inventory-price"><?php echo catalog_escape(catalog_format_price($item['price'])); ?> €</span>
                                 <span class="status-pill <?php echo ($item['status'] ?? '') === 'reserved' ? 'is-muted' : ''; ?>"><?php echo catalog_escape(catalog_status_label($item)); ?></span>
                                 <?php if (($item['status'] ?? '') !== 'reserved' && empty($item['transaction_in_progress'])): ?>
-                                    <label class="part-selector-line" onclick="event.preventDefault(); event.stopPropagation();">
+                                    <label class="part-selector-line">
                                         <input
                                             type="checkbox"
                                             class="vehicle-selector"
@@ -223,6 +220,11 @@ $occasionStructuredData = [
                                 </div>
                             <?php endif; ?>
                         <?php endif; ?>
+                    </div>
+                <?php elseif (!empty($items)): ?>
+                    <div class="detail-card detail-card-placeholder">
+                        <h3>Selectionnez une annonce</h3>
+                        <p>La liste affiche l'integralite des vehicules publies et leur statut. Cliquez sur une annonce pour ouvrir sa fiche detaillee.</p>
                     </div>
                 <?php else: ?>
                     <p>Aucune annonce vehicule n'est disponible pour le moment.</p>
@@ -305,7 +307,27 @@ $occasionStructuredData = [
         };
 
         selectors.forEach(function (cb) {
-            cb.addEventListener('change', syncFromCheckboxes);
+            var selectorLine = cb.closest('.part-selector-line');
+
+            // Prevent the parent row link from hijacking selection clicks.
+            cb.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                cb.checked = !cb.checked;
+                syncFromCheckboxes();
+            });
+
+            if (selectorLine) {
+                selectorLine.addEventListener('click', function (event) {
+                    if (event.target === cb) {
+                        return;
+                    }
+                    event.preventDefault();
+                    event.stopPropagation();
+                    cb.checked = !cb.checked;
+                    syncFromCheckboxes();
+                });
+            }
         });
 
         restoreSelection();
@@ -314,6 +336,7 @@ $occasionStructuredData = [
         if (vehiclesContinueBtn) {
             vehiclesContinueBtn.addEventListener('click', function () {
                 syncFromCheckboxes();
+                alert('Vos choix restent actifs pendant votre navigation sur le site et seront conservés jusqu\'à l\'envoi final de votre demande.');
                 window.location.href = 'catalogue.php';
             });
         }

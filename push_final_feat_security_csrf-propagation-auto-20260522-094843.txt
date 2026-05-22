@@ -1,0 +1,170 @@
+09:48:52.890117 exec-cmd.c:266          trace: resolved executable dir: C:/Program Files/Git/mingw64/bin
+09:48:52.925225 git.c:502               trace: built-in: git push origin feat/security/csrf-propagation-auto-20260522-094843 --force
+09:48:52.939222 run-command.c:673       trace: run_command: GIT_DIR=.git git remote-https origin https://github.com/Clinikauto/site-v3.git
+09:48:52.939222 run-command.c:934       trace: start_command: git remote-https origin https://github.com/Clinikauto/site-v3.git
+09:48:52.980340 exec-cmd.c:266          trace: resolved executable dir: C:/Program Files/Git/mingw64/libexec/git-core
+09:48:53.006826 git.c:810               trace: exec: git-remote-https origin https://github.com/Clinikauto/site-v3.git
+09:48:53.006826 run-command.c:673       trace: run_command: git-remote-https origin https://github.com/Clinikauto/site-v3.git
+09:48:53.006826 run-command.c:934       trace: start_command: git-remote-https origin https://github.com/Clinikauto/site-v3.git
+09:48:53.060768 exec-cmd.c:266          trace: resolved executable dir: C:/Program Files/Git/mingw64/libexec/git-core
+09:48:53.239858 http.c:968              == Info: Could not find host github.com in the .netrc file; using defaults
+09:48:53.273203 http.c:968              == Info: Host github.com:443 was resolved.
+09:48:53.273203 http.c:968              == Info: IPv6: (none)
+09:48:53.273203 http.c:968              == Info: IPv4: 140.82.121.4
+09:48:53.273203 http.c:968              == Info:   Trying 140.82.121.4:443...
+09:48:53.322852 http.c:968              == Info: schannel: disabled automatic use of client certificate
+09:48:53.322852 http.c:968              == Info: ALPN: curl offers http/1.1
+09:48:53.367122 http.c:968              == Info: ALPN: server accepted http/1.1
+09:48:53.367122 http.c:968              == Info: Established connection to github.com (140.82.121.4 port 443) from 192.168.1.15 port 51002 
+09:48:53.367122 http.c:968              == Info: using HTTP/1.x
+09:48:53.367122 http.c:915              => Send header, 0000000200 bytes (0x000000c8)
+09:48:53.367122 http.c:927              => Send header: GET /Clinikauto/site-v3.git/info/refs?service=git-receive-pack HTTP/1.1
+09:48:53.367122 http.c:927              => Send header: Host: github.com
+09:48:53.367122 http.c:927              => Send header: User-Agent: git/2.54.0.windows.1
+09:48:53.367122 http.c:927              => Send header: Accept: */*
+09:48:53.367122 http.c:927              => Send header: Accept-Encoding: deflate, gzip, br, zstd
+09:48:53.367122 http.c:927              => Send header: Pragma: no-cache
+09:48:53.367122 http.c:927              => Send header:
+09:48:53.367122 http.c:968              == Info: Request completely sent off
+09:48:53.391472 http.c:968              == Info: schannel: remote party requests renegotiation
+09:48:53.391472 http.c:968              == Info: schannel: renegotiating SSL/TLS connection
+09:48:53.391472 http.c:968              == Info: schannel: SSL/TLS connection renegotiated
+09:48:53.391472 http.c:968              == Info: schannel: remote party requests renegotiation
+09:48:53.391472 http.c:968              == Info: schannel: renegotiating SSL/TLS connection
+09:48:53.399681 http.c:968              == Info: schannel: SSL/TLS connection renegotiated
+09:48:53.498158 http.c:915              <= Recv header, 0000000027 bytes (0x0000001b)
+09:48:53.498158 http.c:927              <= Recv header: HTTP/1.1 401 Unauthorized
+09:48:53.498158 http.c:915              <= Recv header, 0000000026 bytes (0x0000001a)
+09:48:53.498158 http.c:927              <= Recv header: Server: GitHub-Babel/3.0
+09:48:53.498158 http.c:915              <= Recv header, 0000000054 bytes (0x00000036)
+09:48:53.498158 http.c:927              <= Recv header: Content-Security-Policy: default-src 'none'; sandbox
+09:48:53.498158 http.c:915              <= Recv header, 0000000041 bytes (0x00000029)
+09:48:53.498158 http.c:927              <= Recv header: Content-Type: text/plain; charset=UTF-8
+09:48:53.498158 http.c:915              <= Recv header, 0000000040 bytes (0x00000028)
+09:48:53.498158 http.c:927              <= Recv header: www-authenticate: Basic realm="GitHub"
+09:48:53.498158 http.c:915              <= Recv header, 0000000020 bytes (0x00000014)
+09:48:53.498158 http.c:927              <= Recv header: Content-Length: 26
+09:48:53.498158 http.c:915              <= Recv header, 0000000037 bytes (0x00000025)
+09:48:53.498158 http.c:927              <= Recv header: Date: Fri, 22 May 2026 07:48:53 GMT
+09:48:53.498158 http.c:915              <= Recv header, 0000000023 bytes (0x00000017)
+09:48:53.498158 http.c:927              <= Recv header: X-Frame-Options: DENY
+09:48:53.498158 http.c:915              <= Recv header, 0000000073 bytes (0x00000049)
+09:48:53.498158 http.c:927              <= Recv header: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+09:48:53.498158 http.c:915              <= Recv header, 0000000059 bytes (0x0000003b)
+09:48:53.498158 http.c:927              <= Recv header: X-GitHub-Request-Id: C73A:36AB2D:4150745:3392EBE:6A100A65
+09:48:53.498158 http.c:915              <= Recv header, 0000000002 bytes (0x00000002)
+09:48:53.498158 http.c:927              <= Recv header:
+09:48:53.498158 http.c:968              == Info: Connection #0 to host github.com:443 left intact
+09:48:53.498158 run-command.c:673       trace: run_command: 'git credential-manager get'
+09:48:53.503580 run-command.c:934       trace: start_command: 'C:/Program Files/Git/usr/bin/sh.exe' -c 'git credential-manager get' 'git credential-manager get'
+09:48:53.849032 exec-cmd.c:266          trace: resolved executable dir: C:/Program Files/Git/mingw64/libexec/git-core
+09:48:53.873398 git.c:810               trace: exec: git-credential-manager get
+09:48:53.873398 run-command.c:673       trace: run_command: git-credential-manager get
+09:48:53.873398 run-command.c:934       trace: start_command: git-credential-manager get
+09:48:54.283519 exec-cmd.c:266          trace: resolved executable dir: C:/Program Files/Git/mingw64/libexec/git-core
+09:48:54.308565 git.c:502               trace: built-in: git config --null --list
+09:48:54.615253 http.c:968              == Info: Reusing existing https: connection with host github.com
+09:48:54.615253 http.c:968              == Info: Server auth using Basic with user 'Clinikauto'
+09:48:54.615253 http.c:915              => Send header, 0000000291 bytes (0x00000123)
+09:48:54.615253 http.c:927              => Send header: GET /Clinikauto/site-v3.git/info/refs?service=git-receive-pack HTTP/1.1
+09:48:54.615253 http.c:927              => Send header: Host: github.com
+09:48:54.615253 http.c:927              => Send header: Authorization: Basic <redacted>
+09:48:54.615253 http.c:927              => Send header: User-Agent: git/2.54.0.windows.1
+09:48:54.615253 http.c:927              => Send header: Accept: */*
+09:48:54.615253 http.c:927              => Send header: Accept-Encoding: deflate, gzip, br, zstd
+09:48:54.615253 http.c:927              => Send header: Pragma: no-cache
+09:48:54.615253 http.c:927              => Send header:
+09:48:54.615253 http.c:968              == Info: Request completely sent off
+09:48:54.869245 http.c:915              <= Recv header, 0000000017 bytes (0x00000011)
+09:48:54.869245 http.c:927              <= Recv header: HTTP/1.1 200 OK
+09:48:54.869245 http.c:915              <= Recv header, 0000000026 bytes (0x0000001a)
+09:48:54.869245 http.c:927              <= Recv header: Server: GitHub-Babel/3.0
+09:48:54.869245 http.c:915              <= Recv header, 0000000060 bytes (0x0000003c)
+09:48:54.869245 http.c:927              <= Recv header: Content-Type: application/x-git-receive-pack-advertisement
+09:48:54.869245 http.c:915              <= Recv header, 0000000054 bytes (0x00000036)
+09:48:54.869245 http.c:927              <= Recv header: Content-Security-Policy: default-src 'none'; sandbox
+09:48:54.869245 http.c:915              <= Recv header, 0000000040 bytes (0x00000028)
+09:48:54.869245 http.c:927              <= Recv header: expires: Fri, 01 Jan 1980 00:00:00 GMT
+09:48:54.869245 http.c:915              <= Recv header, 0000000018 bytes (0x00000012)
+09:48:54.869245 http.c:927              <= Recv header: pragma: no-cache
+09:48:54.869245 http.c:915              <= Recv header, 0000000053 bytes (0x00000035)
+09:48:54.869245 http.c:927              <= Recv header: Cache-Control: no-cache, max-age=0, must-revalidate
+09:48:54.869245 http.c:915              <= Recv header, 0000000023 bytes (0x00000017)
+09:48:54.869245 http.c:927              <= Recv header: Vary: Accept-Encoding
+09:48:54.869245 http.c:915              <= Recv header, 0000000028 bytes (0x0000001c)
+09:48:54.869245 http.c:927              <= Recv header: Transfer-Encoding: chunked
+09:48:54.869245 http.c:915              <= Recv header, 0000000037 bytes (0x00000025)
+09:48:54.869245 http.c:927              <= Recv header: Date: Fri, 22 May 2026 07:48:54 GMT
+09:48:54.869245 http.c:915              <= Recv header, 0000000023 bytes (0x00000017)
+09:48:54.869245 http.c:927              <= Recv header: X-Frame-Options: DENY
+09:48:54.869245 http.c:915              <= Recv header, 0000000073 bytes (0x00000049)
+09:48:54.869245 http.c:927              <= Recv header: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+09:48:54.869245 http.c:915              <= Recv header, 0000000059 bytes (0x0000003b)
+09:48:54.869245 http.c:927              <= Recv header: X-GitHub-Request-Id: C73A:36AB2D:4151848:3393CE0:6A100A65
+09:48:54.869245 http.c:915              <= Recv header, 0000000002 bytes (0x00000002)
+09:48:54.869245 http.c:927              <= Recv header:
+09:48:54.869245 http.c:968              == Info: Connection #0 to host github.com:443 left intact
+09:48:54.869245 run-command.c:673       trace: run_command: 'git credential-manager store'
+09:48:54.870249 run-command.c:934       trace: start_command: 'C:/Program Files/Git/usr/bin/sh.exe' -c 'git credential-manager store' 'git credential-manager store'
+09:48:55.049612 exec-cmd.c:266          trace: resolved executable dir: C:/Program Files/Git/mingw64/libexec/git-core
+09:48:55.077608 git.c:810               trace: exec: git-credential-manager store
+09:48:55.077608 run-command.c:673       trace: run_command: git-credential-manager store
+09:48:55.077608 run-command.c:934       trace: start_command: git-credential-manager store
+09:48:55.308042 exec-cmd.c:266          trace: resolved executable dir: C:/Program Files/Git/mingw64/libexec/git-core
+09:48:55.333805 git.c:502               trace: built-in: git config --null --list
+09:48:55.581821 run-command.c:673       trace: run_command: git send-pack --stateless-rpc --helper-status --thin --no-progress https://github.com/Clinikauto/site-v3.git/ --stdin
+09:48:55.581821 run-command.c:934       trace: start_command: git send-pack --stateless-rpc --helper-status --thin --no-progress https://github.com/Clinikauto/site-v3.git/ --stdin
+09:48:55.628700 exec-cmd.c:266          trace: resolved executable dir: C:/Program Files/Git/mingw64/libexec/git-core
+09:48:55.656567 git.c:502               trace: built-in: git send-pack --stateless-rpc --helper-status --thin --no-progress https://github.com/Clinikauto/site-v3.git/ --stdin
+09:48:55.663996 run-command.c:673       trace: run_command: git pack-objects --all-progress-implied --revs --stdout --thin --delta-base-offset -q
+09:48:55.663996 run-command.c:934       trace: start_command: git pack-objects --all-progress-implied --revs --stdout --thin --delta-base-offset -q
+09:48:55.712276 exec-cmd.c:266          trace: resolved executable dir: C:/Program Files/Git/mingw64/libexec/git-core
+09:48:55.736897 git.c:502               trace: built-in: git pack-objects --all-progress-implied --revs --stdout --thin --delta-base-offset -q
+09:48:55.748077 http.c:968              == Info: Reusing existing https: connection with host github.com
+09:48:55.748077 http.c:968              == Info: Server auth using Basic with user 'Clinikauto'
+09:48:55.749102 http.c:915              => Send header, 0000000365 bytes (0x0000016d)
+09:48:55.749102 http.c:927              => Send header: POST /Clinikauto/site-v3.git/git-receive-pack HTTP/1.1
+09:48:55.749102 http.c:927              => Send header: Host: github.com
+09:48:55.749102 http.c:927              => Send header: Authorization: Basic <redacted>
+09:48:55.749102 http.c:927              => Send header: User-Agent: git/2.54.0.windows.1
+09:48:55.749102 http.c:927              => Send header: Accept-Encoding: deflate, gzip, br, zstd
+09:48:55.749102 http.c:927              => Send header: Content-Type: application/x-git-receive-pack-request
+09:48:55.749102 http.c:927              => Send header: Accept: application/x-git-receive-pack-result
+09:48:55.749102 http.c:927              => Send header: Content-Length: 276
+09:48:55.749102 http.c:927              => Send header:
+09:48:55.749102 http.c:968              == Info: upload completely sent off: 276 bytes
+09:48:56.368033 http.c:915              <= Recv header, 0000000017 bytes (0x00000011)
+09:48:56.368033 http.c:927              <= Recv header: HTTP/1.1 200 OK
+09:48:56.368033 http.c:915              <= Recv header, 0000000026 bytes (0x0000001a)
+09:48:56.368033 http.c:927              <= Recv header: Server: GitHub-Babel/3.0
+09:48:56.368033 http.c:915              <= Recv header, 0000000053 bytes (0x00000035)
+09:48:56.368033 http.c:927              <= Recv header: Content-Type: application/x-git-receive-pack-result
+09:48:56.368033 http.c:915              <= Recv header, 0000000054 bytes (0x00000036)
+09:48:56.368033 http.c:927              <= Recv header: Content-Security-Policy: default-src 'none'; sandbox
+09:48:56.369045 http.c:915              <= Recv header, 0000000040 bytes (0x00000028)
+09:48:56.369045 http.c:927              <= Recv header: expires: Fri, 01 Jan 1980 00:00:00 GMT
+09:48:56.369045 http.c:915              <= Recv header, 0000000018 bytes (0x00000012)
+09:48:56.369045 http.c:927              <= Recv header: pragma: no-cache
+09:48:56.369045 http.c:915              <= Recv header, 0000000053 bytes (0x00000035)
+09:48:56.369045 http.c:927              <= Recv header: Cache-Control: no-cache, max-age=0, must-revalidate
+09:48:56.369045 http.c:915              <= Recv header, 0000000023 bytes (0x00000017)
+09:48:56.369045 http.c:927              <= Recv header: Vary: Accept-Encoding
+09:48:56.369045 http.c:915              <= Recv header, 0000000028 bytes (0x0000001c)
+09:48:56.369045 http.c:927              <= Recv header: Transfer-Encoding: chunked
+09:48:56.369045 http.c:915              <= Recv header, 0000000037 bytes (0x00000025)
+09:48:56.369045 http.c:927              <= Recv header: Date: Fri, 22 May 2026 07:48:56 GMT
+09:48:56.369045 http.c:915              <= Recv header, 0000000023 bytes (0x00000017)
+09:48:56.369045 http.c:927              <= Recv header: X-Frame-Options: DENY
+09:48:56.369045 http.c:915              <= Recv header, 0000000073 bytes (0x00000049)
+09:48:56.369045 http.c:927              <= Recv header: Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+09:48:56.369045 http.c:915              <= Recv header, 0000000059 bytes (0x0000003b)
+09:48:56.369045 http.c:927              <= Recv header: X-GitHub-Request-Id: C73A:36AB2D:4152963:3394A58:6A100A67
+09:48:56.369045 http.c:915              <= Recv header, 0000000002 bytes (0x00000002)
+09:48:56.369045 http.c:927              <= Recv header:
+09:48:56.369045 http.c:968              == Info: Connection #0 to host github.com:443 left intact
+remote: 
+remote: Create a pull request for 'feat/security/csrf-propagation-auto-20260522-094843' on GitHub by visiting:        
+remote:      https://github.com/Clinikauto/site-v3/pull/new/feat/security/csrf-propagation-auto-20260522-094843        
+remote: 
+To https://github.com/Clinikauto/site-v3.git
+ * [new branch]      feat/security/csrf-propagation-auto-20260522-094843 -> feat/security/csrf-propagation-auto-20260522-094843

@@ -225,7 +225,7 @@
                 return;
             }
             var visible = isDevisCategoriesZoneVisible();
-            devisCategoriesToggleButton.textContent = 'Zone categories devis';
+            devisCategoriesToggleButton.textContent = 'Categories devis';
             devisCategoriesToggleButton.classList.toggle('is-visible', visible);
             devisCategoriesToggleButton.classList.toggle('is-hidden', !visible);
             applyConsoleButtonStateStyles(devisCategoriesToggleButton, visible);
@@ -243,7 +243,7 @@
             });
 
             if (devisCategoriesToggleButton) {
-                devisCategoriesToggleButton.textContent = 'Zone categories devis';
+                devisCategoriesToggleButton.textContent = 'Categories devis';
                 devisCategoriesToggleButton.classList.toggle('is-visible', visible);
                 devisCategoriesToggleButton.classList.toggle('is-hidden', !visible);
                 applyConsoleButtonStateStyles(devisCategoriesToggleButton, visible);

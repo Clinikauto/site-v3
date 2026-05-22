@@ -85,4 +85,25 @@
     <priority>0.7</priority>
   </url>
 
+  <url>
+    <loc>https://www.clinikauto.fr/contact/contact.php</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.clinikauto.fr/devis/devis.php</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.clinikauto.fr/rdv/rdv.php</loc>
+    <lastmod>2026-05-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
 </urlset>

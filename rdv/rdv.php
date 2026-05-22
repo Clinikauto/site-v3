@@ -103,7 +103,7 @@ $form = [
     "linked_title" => "",
 ];
 
-foreach (["customer_type", "nom", "prenom", "adresse", "code_postal", "ville", "telephone", "email", "objet", "request_context_type", "linked_request_id", "linked_annonce_id", "linked_title"] as $prefill_key) {
+foreach (["customer_type", "nom", "prenom", "adresse", "code_postal", "ville", "telephone", "email", "date", "heure", "objet", "request_context_type", "linked_request_id", "linked_annonce_id", "linked_title"] as $prefill_key) {
     if (isset($_GET[$prefill_key]) && $form[$prefill_key] === "") {
         $form[$prefill_key] = trim((string) $_GET[$prefill_key]);
     }
@@ -305,7 +305,35 @@ $all_holidays = array_values(array_unique(array_merge($holidays_this_year, $holi
             <p>Remplissez le formulaire ci-dessous, nous vous confirmons votre créneau dans les meilleurs délais.</p>
         </section>
         <section class="spaced-section">
-        <?php if ($prefill_notice !== '') { echo "<p class='success-message'>" . htmlspecialchars($prefill_notice) . "</p>"; } ?>
+        <?php if ($prefill_notice !== ''): ?>
+            <div id="auto-confirm-modal" class="auto-confirm-modal" aria-hidden="true">
+                <div class="auto-confirm-modal__panel">
+                    <span class="hero-badge">⭐ Votre garage de confiance</span>
+                    <h2><?php echo htmlspecialchars($prefill_notice); ?></h2>
+                    <p>Merci d'avoir contacté ClinikAuto</p>
+                </div>
+            </div>
+            <script>
+            (function () {
+                try {
+                    var modal = document.getElementById('auto-confirm-modal');
+                    if (!modal) return;
+                    // show modal
+                    modal.style.display = 'flex';
+                    // force reflow for transition
+                    void modal.offsetWidth;
+                    modal.style.opacity = '1';
+                    // hide after 3s then redirect
+                    setTimeout(function () {
+                        modal.style.opacity = '0';
+                        setTimeout(function () {
+                            window.location = '/index.html';
+                        }, 300);
+                    }, 3000);
+                } catch (e) { /* silent */ }
+            })();
+            </script>
+        <?php endif; ?>
         <?php if ($message)       { echo "<p class='success-message'>" . htmlspecialchars($message) . "</p>"; } ?>
         <?php if ($error_message) { echo "<p class='error-message'>"   . htmlspecialchars($error_message) . "</p>"; } ?>
         <?php if ($recognized_message !== '') { echo "<p class='success-message'>" . htmlspecialchars($recognized_message) . "</p>"; } ?>

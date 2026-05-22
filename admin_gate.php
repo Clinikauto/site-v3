@@ -5,14 +5,48 @@
  * Un code à 4 chiffres aléatoire est envoyé par email, valable 10 minutes.
  */
 
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/includes/catalog_store.php';
+
+// Initialisation sécurisée de la session — adaptée pour le développement/production
+// Détecte si la connexion est en HTTPS pour définir le flag `secure`.
+$secureFlag = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+    (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+$cookieParams = [
+    'lifetime' => 0,
+    'path' => '/',
+    'domain' => '',
+    'secure' => $secureFlag,
+    'httponly' => true,
+    'samesite' => 'Lax'
+];
+if (PHP_VERSION_ID >= 70300) {
+    session_set_cookie_params($cookieParams);
+} else {
+    session_set_cookie_params(
+        $cookieParams['lifetime'],
+        $cookieParams['path'],
+        $cookieParams['domain'],
+        $cookieParams['secure'],
+        $cookieParams['httponly']
+    );
+}
 session_start();
 
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 header('Expires: 0');
 
-require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/includes/catalog_store.php';
+// CSRF protection for admin gate
+require_once __DIR__ . '/includes/security.php';
+csrf_init();
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+    if (!csrf_validate_request() && !gate_is_local_runtime()) {
+        http_response_code(400);
+        echo 'Requête invalide (CSRF)';
+        exit;
+    }
+}
 
 // ─── Constantes ───────────────────────────────────────────────────────────────
 define('GATE_CODE_FILE',    __DIR__ . '/data/admin_gate_code.json');
@@ -231,6 +265,7 @@ $garageName = defined('GARAGE_NOM') ? htmlspecialchars(GARAGE_NOM, ENT_QUOTES, '
     <title>Accès administrateur - <?= $garageName ?></title>
     <link rel="stylesheet" href="assets/style.css">
     <?php echo catalog_get_google_analytics_script(); ?>
+    <?php if (function_exists('csrf_print_meta_and_js')) { csrf_print_meta_and_js(); } ?>
     <style>
         .gate-wrapper {
             min-height: 100vh;
@@ -320,6 +355,7 @@ $garageName = defined('GARAGE_NOM') ? htmlspecialchars(GARAGE_NOM, ENT_QUOTES, '
             </p>
             <form method="post" action="admin_gate.php">
                 <input type="hidden" name="action" value="send_code">
+                <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(csrf_get_token(), ENT_QUOTES, 'UTF-8') . '">'; ?>
                 <button type="submit" class="gate-btn-primary">Envoyer le code par email</button>
             </form>
 
@@ -330,6 +366,7 @@ $garageName = defined('GARAGE_NOM') ? htmlspecialchars(GARAGE_NOM, ENT_QUOTES, '
             </p>
             <form method="post" action="admin_gate.php" autocomplete="off">
                 <input type="hidden" name="action" value="verify_code">
+                <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(csrf_get_token(), ENT_QUOTES, 'UTF-8') . '">'; ?>
                 <input
                     type="text"
                     name="otp_code"
@@ -345,6 +382,7 @@ $garageName = defined('GARAGE_NOM') ? htmlspecialchars(GARAGE_NOM, ENT_QUOTES, '
             </form>
             <form method="post" action="admin_gate.php" style="margin-top:.4rem;">
                 <input type="hidden" name="action" value="resend_code">
+                <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(csrf_get_token(), ENT_QUOTES, 'UTF-8') . '">'; ?>
                 <button type="submit" class="gate-btn-secondary">Renvoyer un nouveau code</button>
             </form>
         <?php endif; ?>

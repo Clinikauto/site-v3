@@ -6,7 +6,7 @@
 define('GARAGE_NOM', 'Clinik Auto');
 define('GARAGE_ADRESSE', '__A_COMPLETER__');
 define('GARAGE_TEL', '__A_COMPLETER__');
-define('GARAGE_EMAIL', '__A_COMPLETER__');
+define('GARAGE_EMAIL', 'clinikauto74@gmail.com');
 define('GARAGE_HORAIRES', '__A_COMPLETER__');
 
 // ===== CONFIGURATION BASE DE DONNEES =====
@@ -17,7 +17,7 @@ define('DB_PASS', '__A_COMPLETER__');
 define('DB_NAME', '__A_COMPLETER__');
 
 // ===== CONFIGURATION EMAIL =====
-define('EMAIL_EXPEDITEUR', '__A_COMPLETER__');
+define('EMAIL_EXPEDITEUR', 'smtp@clinikauto.fr');
 define('SMTP_ENABLED', true);
 define('SMTP_HOST', '__A_COMPLETER__');
 define('SMTP_PORT', 587);

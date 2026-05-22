@@ -4,12 +4,23 @@
  * Génère et valide les tokens d'authentification pour l'API Google Calendar.
  */
 
+require_once __DIR__ . '/includes/security.php';
+
+// CSRF: init and validate POST (toléré en local de dev)
+csrf_init();
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+    if (!csrf_validate_request() && !CATALOG_IS_LOCAL_RUNTIME) {
+        http_response_code(400);
+        echo 'Requête invalide (CSRF)';
+        exit;
+    }
+}
 session_start();
 
 // Configuration
 const CLIENT_ID_PLACEHOLDER = 'xxx.apps.googleusercontent.com';
 const CLIENT_SECRET_PLACEHOLDER = 'GOCSPX-...';
-const REDIRECT_URI = 'http://127.0.0.1:8001/google-oauth-setup.php';
+const REDIRECT_URI = 'https://www.clinikauto.fr/google-oauth-setup.php';
 const GOOGLE_AUTH_URI = 'https://accounts.google.com/o/oauth2/auth';
 const GOOGLE_TOKEN_URI = 'https://oauth2.googleapis.com/token';
 
@@ -73,6 +84,13 @@ $authUrl = '';
 $savedClientId = $_SESSION['gc_client_id'] ?? '';
 $savedClientSecret = $_SESSION['gc_client_secret'] ?? '';
 
+// Réinitialisation explicite depuis l'UI
+if (isset($_POST['reset']) && $_POST['reset'] === '1') {
+    unset($_SESSION['gc_tokens']);
+    header('Location: ' . REDIRECT_URI);
+    exit;
+}
+
 // Étape 2 : Générer URL d'autorisation
 if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $clientId = trim((string) ($_POST['client_id'] ?? ''));
@@ -82,6 +100,8 @@ if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $errorMsg = 'Veuillez remplir Client ID et Client Secret.';
         $step = 2;
     } else {
+        // Forcer un nouveau cycle OAuth complet si un ancien résultat existe.
+        unset($_SESSION['gc_tokens']);
         $_SESSION['gc_client_id'] = $clientId;
         $_SESSION['gc_client_secret'] = $clientSecret;
 
@@ -91,6 +111,8 @@ if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
             'response_type' => 'code',
             'scope'         => 'https://www.googleapis.com/auth/calendar',
             'access_type'   => 'offline',
+            'prompt'        => 'consent',
+            'include_granted_scopes' => 'false',
         ];
         $authUrl = GOOGLE_AUTH_URI . '?' . http_build_query($params);
         $infoMsg = 'Cliquez sur le bouton ci-dessous pour autoriser Clinik Auto à accéder à votre Google Agenda.';
@@ -100,7 +122,7 @@ if ($step === 2 && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Étape 3 : Traiter le callback et récupérer le refresh token
 $code = $_GET['code'] ?? '';
-if ($code && !isset($_SESSION['gc_tokens'])) {
+if ($code) {
     $clientId = $_SESSION['gc_client_id'] ?? '';
     $clientSecret = $_SESSION['gc_client_secret'] ?? '';
 
@@ -110,10 +132,15 @@ if ($code && !isset($_SESSION['gc_tokens'])) {
         [$ok, $result] = request_google_access_token($clientId, $clientSecret, $code);
 
         if ($ok) {
-            $_SESSION['gc_tokens'] = $result;
             $tokens = $result;
             $step = 3;
-            $infoMsg = 'Authentification réussie ! Votre Refresh Token est prêt.';
+            if (!empty($tokens['refresh_token'])) {
+                $_SESSION['gc_tokens'] = $result;
+                $infoMsg = 'Authentification réussie ! Votre Refresh Token est prêt.';
+            } else {
+                unset($_SESSION['gc_tokens']);
+                $errorMsg = 'Google a valide l\'authentification mais n\'a pas renvoye de refresh token. Cliquez sur Recommencer puis re-validez l\'acces avec consentement.';
+            }
         } else {
             $errorMsg = $result;
             $step = 2;
@@ -163,6 +190,7 @@ if (isset($_SESSION['gc_tokens'])) {
         .step-dot.active { background: #667eea; }
         .step-dot.completed { background: #4caf50; }
     </style>
+    <?php if (function_exists('csrf_print_meta_and_js')) { csrf_print_meta_and_js(); } ?>
 </head>
 <body>
 <div class="container">
@@ -196,6 +224,7 @@ if (isset($_SESSION['gc_tokens'])) {
         </ol>
         <form method="POST">
             <input type="hidden" name="step" value="2">
+            <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(csrf_get_token(), ENT_QUOTES, 'UTF-8') . '">'; ?>
             <button class="btn" type="submit">Continuer vers l'étape 2 →</button>
         </form>
 
@@ -203,6 +232,7 @@ if (isset($_SESSION['gc_tokens'])) {
         <h2>Étape 2 — Saisir les identifiants</h2>
         <form method="POST">
             <input type="hidden" name="step" value="2">
+            <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(csrf_get_token(), ENT_QUOTES, 'UTF-8') . '">'; ?>
             <label for="client_id">Client ID</label>
             <input type="text" id="client_id" name="client_id" value="<?= escape_html($savedClientId) ?>" placeholder="xxx.apps.googleusercontent.com" required>
             <label for="client_secret">Client Secret</label>
@@ -235,6 +265,7 @@ define('GOOGLE_REFRESH_TOKEN', '<?= escape_html($tokens['refresh_token']) ?>');<
 
             <div class="button-group">
                 <form method="POST" style="flex: 1;">
+                    <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(csrf_get_token(), ENT_QUOTES, 'UTF-8') . '">'; ?>
                     <button type="submit" class="btn" name="reset" value="1">🔄 Recommencer</button>
                 </form>
                 <a href="admin.php" class="btn btn-secondary" style="text-decoration: none; text-align: center;">✓ Accueil Admin</a>
@@ -242,6 +273,7 @@ define('GOOGLE_REFRESH_TOKEN', '<?= escape_html($tokens['refresh_token']) ?>');<
         <?php else: ?>
             <div class="error">Erreur : Aucun token reçu. Veuillez recommencer.</div>
             <form method="POST">
+                <?php echo '<input type="hidden" name="_csrf" value="' . htmlspecialchars(csrf_get_token(), ENT_QUOTES, 'UTF-8') . '">'; ?>
                 <button type="submit" class="btn">Recommencer</button>
             </form>
         <?php endif; ?>

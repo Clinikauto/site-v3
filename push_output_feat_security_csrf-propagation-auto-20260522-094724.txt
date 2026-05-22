@@ -1,0 +1,6 @@
+09:47:27.282776 exec-cmd.c:266          trace: resolved executable dir: C:/Program Files/Git/mingw64/bin
+fatal: detected dubious ownership in repository at 'E:/site clinikauto/site-v3-clone'
+'E:/site clinikauto/site-v3-clone' is on a file system that does not record ownership
+To add an exception for this directory, call:
+
+	git config --global --add safe.directory 'E:/site clinikauto/site-v3-clone'

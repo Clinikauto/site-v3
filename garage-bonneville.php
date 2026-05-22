@@ -81,6 +81,7 @@ catalog_track_visit('local_bonneville');
     }
     </script>
     <?php echo catalog_get_google_analytics_script(); ?>
+    <?php if (function_exists('csrf_print_meta_and_js')) { csrf_print_meta_and_js(); } ?>
 </head>
 <body class="public-page">
 <header>
@@ -101,7 +102,7 @@ catalog_track_visit('local_bonneville');
     </nav>
 </header>
 
-<main>
+<main class="page-main-hero">
     <section>
         <nav aria-label="Fil d'Ariane">
             <ol class="breadcrumb-list">
@@ -205,6 +206,8 @@ catalog_track_visit('local_bonneville');
     </p>
     <p class="footer-copy">&copy; 2026 Clinik Auto. Tous droits r&eacute;serv&eacute;s.</p>
 </footer>
+<button class="site-back-top-floating" id="site-back-top" aria-label="Retour en haut de la page">↑</button>
+<script>!function(){var b=document.getElementById('site-back-top');if(!b)return;window.addEventListener('scroll',function(){b.classList.toggle('is-visible',window.scrollY>420);},{passive:true});b.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});}();</script>
 <script src="assets/conversion-tracking.js" defer></script>
 </body>
 </html>
