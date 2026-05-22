@@ -1,3 +1,0 @@
-09:55:43.615687 exec-cmd.c:266          trace: resolved executable dir: C:/Program Files/Git/mingw64/bin
-09:55:43.666171 git.c:502               trace: built-in: git merge --no-ff --no-edit feat/security/csrf-propagation-auto-20260522-094843
-Already up to date.
