@@ -83,6 +83,7 @@ $devisStructuredData = [
     <script type="application/ld+json">
         <?php echo json_encode($devisStructuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
     </script>
+    <?php if (function_exists('csrf_print_meta_and_js')) { csrf_print_meta_and_js(); } ?>
 </head>
 <body class="public-page">
     <header>
@@ -102,17 +103,33 @@ $devisStructuredData = [
             </ul>
         </nav>
     </header>
-    <main>
-        <h1>Demande de devis automobile</h1>
-        <p>Service sélectionné : <strong><?php echo htmlspecialchars($service_label); ?></strong></p>
-        <p class="form-note">Cochez une ou plusieurs prestations. Le compteur s'incrémente automatiquement selon vos choix.</p>
+    <main class="devis-main">
+        <section>
+            <div class="devis-hero-inner">
+                <span class="devis-hero-tag">Demande de devis</span>
+                <h1>Votre devis auto personnalisé</h1>
+                <p class="devis-hero-sub">Sélectionnez vos prestations &mdash; notre équipe vous recontacte rapidement pour confirmer le rendez-vous.</p>
+                <div class="devis-trust-row">
+                    <span class="devis-trust-pill">✓&nbsp;100&nbsp;% Gratuit</span>
+                    <span class="devis-trust-pill">⚡&nbsp;Réponse rapide</span>
+                    <span class="devis-trust-pill">🔒&nbsp;Sans engagement</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="devis-content-wrap">
+            <?php if ($service !== ''): ?>
+            <p class="devis-service-label">Service&nbsp;: <strong><?php echo htmlspecialchars($service_label); ?></strong></p>
+            <?php endif; ?>
+            <p class="form-note">Cochez une ou plusieurs prestations ci-dessous. Le compteur s'incrémente automatiquement selon vos choix.</p>
 
         <form id="devis-form" class="quote-form" method="get" action="../contact/contact.php">
             <input type="hidden" name="prestations" id="prestations-hidden" value="">
             <input type="hidden" name="source_service" value="<?php echo htmlspecialchars($service_label); ?>">
 
             <div class="selection-panel">
-                <span class="counter-badge">Prestations sélectionnées : <strong id="selected-count">0</strong></span>
+                <span class="counter-badge"><strong id="selected-count">0</strong> prestation<span class="counter-plural-s"></span> sélectionnée<span class="counter-plural-s"></span></span>
+                <span class="selection-panel-hint">↓ Cochez ci-dessous</span>
             </div>
 
             <?php foreach ($devisCategories as $category): ?>
@@ -127,7 +144,9 @@ $devisStructuredData = [
                 ?>
                 <div class="devis-category">
                     <div class="devis-category-header">
-                        <span class="cat-icon"><?php echo htmlspecialchars($categoryIcon !== '' ? $categoryIcon : '🛠️', ENT_QUOTES, 'UTF-8'); ?></span>
+                        <?php if ($categoryIcon !== ''): ?>
+                            <span class="cat-icon"><?php echo htmlspecialchars($categoryIcon, ENT_QUOTES, 'UTF-8'); ?></span>
+                        <?php endif; ?>
                         <h3><?php echo htmlspecialchars($categoryTitle, ENT_QUOTES, 'UTF-8'); ?></h3>
                     </div>
                     <div class="devis-category-body checklist-grid">
@@ -179,6 +198,7 @@ $devisStructuredData = [
                 Des prestations d'un autre service sont déjà mémorisées et seront incluses lors de la validation.
             </p>
         </form>
+        </div><!-- /.devis-content-wrap -->
     </main>
     <footer>
         <address>
@@ -205,6 +225,7 @@ $devisStructuredData = [
         var hiddenInput = document.getElementById('prestations-hidden');
         var continueBtn = document.getElementById('devis-continue-btn');
         var savedNotice = document.getElementById('devis-saved-notice');
+        var navigationNotice = 'Vos prestations restent actives pendant votre navigation sur le site et seront conservées jusqu\'à l\'envoi final de votre demande.';
 
         /* --- Lecture / écriture localStorage --- */
         function loadSaved() {
@@ -275,6 +296,7 @@ $devisStructuredData = [
         if (continueBtn) {
             continueBtn.addEventListener('click', function () {
                 saveCurrent(mergedSelections());
+                alert(navigationNotice);
                 window.location.href = '../index.html';
             });
         }

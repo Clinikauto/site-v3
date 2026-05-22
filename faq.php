@@ -31,11 +31,6 @@ catalog_track_visit('faq_page');
     <meta name="twitter:image" content="https://www.clinikauto.fr/assets/logo.png">
     <link rel="icon" type="image/png" href="assets/logo.png">
     <link rel="stylesheet" href="assets/style.css">
-    <style>
-    /* Inline FAQ hero helper - added to force immediate centering during local dev */
-    .faq-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px 12px}
-    .faq-hero .hero-badge{text-transform:uppercase;letter-spacing:0.06em;font-weight:600}
-    </style>
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -231,7 +226,7 @@ catalog_track_visit('faq_page');
 </header>
 
 <main class="page-main-hero">
-    <section class="faq-hero">
+    <section>
         <span class="hero-badge">❓ QUESTIONS FREQUENTES</span>
         <h1>F.A.Q Clinik Auto</h1>
         <p>Retrouvez ici les reponses aux questions les plus frequentes sur notre metier, nos prestations, la qualite de notre travail, la prise de rendez-vous, les garanties, les pieces, les vehicules d'occasion et l'utilisation du site web.</p>
