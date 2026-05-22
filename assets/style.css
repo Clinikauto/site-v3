@@ -399,6 +399,21 @@ main p {
     margin-top: 18px;
 }
 
+/* Ensure hero sections inside pages using .page-main-hero are centered like the FAQ */
+.page-main-hero > section:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px 12px;
+}
+.page-main-hero > section:first-child .hero-badge {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+}
+
 .contact-hero-actions .cta-link-secondary {
     margin-left: 0;
     border-color: rgba(255, 255, 255, 0.65);
@@ -2618,4 +2633,13 @@ footer .footer-copy {
         grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 8px;
     }
+}
+
+/* Robust centering helper for hero blocks */
+.hero-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
