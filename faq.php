@@ -227,14 +227,10 @@ catalog_track_visit('faq_page');
 
 <main class="page-main-hero">
     <section>
-        <span class="hero-badge">❓ Questions fréquentes</span>
-        <h1>F.A.Q Clinik Auto</h1>
-        <p>Retrouvez ici les reponses aux questions les plus frequentes sur notre metier, nos prestations, la qualite de notre travail, la prise de rendez-vous, les garanties, les pieces, les vehicules d'occasion et l'utilisation du site web.</p>
-        <!-- Boutons supprimés par demande de validation avant déploiement -->
-        <div class="cta-inline">
-            <!-- Intentionnellement vide -->
-        </div>
-    </section>
+            <span class="hero-badge">⭐ Votre garage de confiance</span>
+            <h1>Garage automobile à Scionzier : révision, réparation et vente d'occasion</h1>
+            <p>Révision, entretien, réparation multimarque et vente de véhicules d'occasion à Scionzier (74950) — devis gratuit, réponse rapide.</p>
+        </section>
 
     <section class="spaced-section" id="faq">
         <h2>Questions fréquentes</h2>
