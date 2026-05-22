@@ -166,7 +166,7 @@ main h2 {
 
 .hero-badge {
     display: inline-block;
-    background: linear-gradient(90deg, var(--brand-gold), #ffe08a);
+    background: #c7d3d3;
     color: var(--brand-navy);
     font-weight: 700;
     font-size: 0.82em;
