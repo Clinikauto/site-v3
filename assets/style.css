@@ -2619,3 +2619,12 @@ footer .footer-copy {
         gap: 8px;
     }
 }
+
+/* Robust centering helper for hero blocks */
+.hero-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
