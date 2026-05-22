@@ -225,20 +225,14 @@ catalog_track_visit('faq_page');
     </nav>
 </header>
 
-<main>
+<main class="page-main-hero">
     <section>
-        <nav aria-label="Fil d'Ariane">
-            <ol class="breadcrumb-list">
-                <li><a href="index.html">Accueil</a></li>
-                <li aria-current="page">F.A.Q</li>
-            </ol>
-        </nav>
         <span class="hero-badge">❓ Questions fréquentes</span>
         <h1>F.A.Q Clinik Auto</h1>
         <p>Retrouvez ici les reponses aux questions les plus frequentes sur notre metier, nos prestations, la qualite de notre travail, la prise de rendez-vous, les garanties, les pieces, les vehicules d'occasion et l'utilisation du site web.</p>
+        <!-- Boutons supprimés par demande de validation avant déploiement -->
         <div class="cta-inline">
-            <a href="devis/devis.php" class="cta-link">Demander un devis</a>
-            <a href="rdv/rdv.php" class="cta-link-secondary">Prendre rendez-vous</a>
+            <!-- Intentionnellement vide -->
         </div>
     </section>
 
@@ -318,6 +312,8 @@ catalog_track_visit('faq_page');
     </p>
     <p class="footer-copy">&copy; 2026 Clinik Auto. Tous droits r&eacute;serv&eacute;s.</p>
 </footer>
+<button class="site-back-top-floating" id="site-back-top" aria-label="Retour en haut de la page">↑</button>
+<script>!function(){var b=document.getElementById('site-back-top');if(!b)return;window.addEventListener('scroll',function(){b.classList.toggle('is-visible',window.scrollY>420);},{passive:true});b.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});}();</script>
 <script src="assets/conversion-tracking.js" defer></script>
 </body>
 </html>
