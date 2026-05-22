@@ -226,8 +226,8 @@ catalog_track_visit('faq_page');
 </header>
 
 <main class="page-main-hero">
-    <section style="text-align:center">
-            <span class="hero-badge">❓ Questions fréquentes</span>
+    <section style="text-align:center;">
+            <span class="hero-badge">❓ QUESTIONS FREQUENTES</span>
             <h1>F.A.Q Clinik Auto</h1>
             <p>Retrouvez ici les reponses aux questions les plus frequentes sur notre metier, nos prestations, la qualite de notre travail, la prise de rendez-vous, les garanties, les pieces, les vehicules d'occasion et l'utilisation du site web.</p>
         </section>
