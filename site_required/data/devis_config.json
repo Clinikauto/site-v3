@@ -1,0 +1,368 @@
+{
+    "categories": [
+        {
+            "id": "entretien-revision",
+            "title": "Moteur & Transmission  ( page est en cour de mise a jour)",
+            "icon": "🔋",
+            "hidden_on_devis": false,
+            "options": [
+                {
+                    "label": "Vidange moteur (filtre à huile inclus)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Vidange et filtres (huile, air)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Vidange et filtres (huile, air, carburant)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Vidange et tous les filtres (huile, air, carburant, habitacle)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Révision constructeur (selon préconisations)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Révision périodique (kilométrage ou durée)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Contrôle général pré-hiver/pré-été",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Remplacement liquide de refroidissement (Préconiser tous les 3 ans en moyenne)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Contrôle circuit de refroidissement",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Diagnostic moteur (voyants, performances)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Contrôle et remplacement bougies (allumage/préchauffage)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Remplacement courroie d’accessoires",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Régénération/nettoyage filtre à particules (FAP)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Remplacement filtre à carburant",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Remplacement pompe à eau",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Contrôle et remplacement durites (circuit de refroidissement, carburant, etc.)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Nettoyage admission d’air",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Remplacement souffet de cardans",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Remplacement cardans/transmissions",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Remplacement sonde lambda",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Remplacement collier de serrage et durites défectueuses",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Amortisseurs (fuites, usure, efficacité)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Ressorts (affaissement, corrosion, cassure)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Rotules de direction (usure, jeu)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Rotules de suspension (jeu, usure)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Bielletes de suspension (état des silentblocs, jeu)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Barres stabilisatrices (fixations, silentblocs)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Triangles de suspension (déformation, corrosion)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Crémaillère de direction (jeu, fuites, étanchéité)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Niveau et état du liquide de direction assistée",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                }
+            ]
+        },
+        {
+            "id": "reparation-diagnostic",
+            "title": "Freinage",
+            "icon": "🛑",
+            "hidden_on_devis": false,
+            "options": [
+                {
+                    "label": "Contrôle des freins (avant/arrière)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Remplacement plaquettes de frein (avant/arrière)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Remplacement disques de frein (avant/arrière)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Remplacement étriers de frein (avant/arrière)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Remplacement câbles de frein à main",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Purge du circuit de freinage",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Remplacement liquide de frein (Préconiser tous les deux ans ou 30 000 kilomètres)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Flexibles de frein (fissures, fuites)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                }
+            ]
+        },
+        {
+            "id": "services-auto",
+            "title": "Nos services auto en cours de mise à jour",
+            "icon": "✨",
+            "hidden_on_devis": true,
+            "options": [
+                {
+                    "label": "Recherche vehicule d'occasion",
+                    "unavailable_on_devis": true,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Controle avant achat",
+                    "unavailable_on_devis": true,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Enlevement VHU",
+                    "unavailable_on_devis": true,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Pre-Controle Technique",
+                    "unavailable_on_devis": true,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Remorquage et dépannage",
+                    "unavailable_on_devis": true,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Vente de pièces détachées (pneus, batteries, etc.)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                }
+            ]
+        },
+        {
+            "id": "contr-les-techniques-s-curit",
+            "title": "Contrôles Techniques & Sécurité",
+            "icon": "⚠️",
+            "hidden_on_devis": false,
+            "options": [
+                {
+                    "label": "Contrôle technique obligatoire (CT)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Contrôle anti-pollution",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Vérification systèmes de sécurité (ceintures, airbags)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Contrôle éclairage et signalisation",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                }
+            ]
+        },
+        {
+            "id": "pneumatiques",
+            "title": "Pneumatiques",
+            "icon": "🛞",
+            "hidden_on_devis": false,
+            "options": [
+                {
+                    "label": "contrôle gratuit des pneus (pression, usure)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Pneus hiver (usure, profondeur ≥ 4 mm recommandée)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Pneus été",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Pneus toutes saisons",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Pneus renforcés (pour utilitaires/S.U.Vou charges lourdes)",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                },
+                {
+                    "label": "Montage roue complete",
+                    "unavailable_on_devis": false,
+                    "icon": "",
+                    "id": ""
+                }
+            ]
+        }
+    ]
+}

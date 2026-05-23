@@ -1,13 +1,7 @@
 <?php
-// Chargement centralisé de la configuration (gère l'initialisation de session)
+session_start();
+
 require_once __DIR__ . '/config.php';
-
-// S'assurer que la session est démarrée si nécessaire
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
-require_once __DIR__ . '/includes/catalog_store.php';
 require_once __DIR__ . '/includes/catalog_store.php';
 require_once __DIR__ . '/includes/security.php';
 

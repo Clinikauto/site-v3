@@ -1,0 +1,369 @@
+﻿Site audit started: 05/22/2026 01:19:47
+Root: E:\
+
+==== Root listing ====
+
+
+Name                               Mode   LastWriteTime       Length
+----                               ----   -------------       ------
+System Volume Information          d--hs- 17/08/2025 23:53:48       
+.git                               d----- 22/05/2026 01:14:58       
+.well-known                        d----- 22/05/2026 01:15:44       
+assets                             d----- 22/05/2026 01:15:48       
+cgi-bin                            d----- 22/05/2026 01:15:48       
+backups                            d----- 22/05/2026 01:15:50       
+catalogue                          d----- 22/05/2026 01:15:54       
+contact                            d----- 22/05/2026 01:16:00       
+data                               d----- 22/05/2026 01:16:02       
+deploy                             d----- 22/05/2026 01:16:10       
+site-restore-21mai2026             d----- 22/05/2026 01:16:12       
+devis                              d----- 22/05/2026 01:16:14       
+email-logs                         d----- 22/05/2026 01:16:14       
+includes                           d----- 22/05/2026 01:16:14       
+rdv                                d----- 22/05/2026 01:16:14       
+vendor                             d----- 22/05/2026 01:17:22       
+google-oauth-setup.php             -a---- 22/05/2026 01:14:54 13276 
+google-reviews.php                 -a---- 22/05/2026 01:14:56 4620  
+index.html                         -a---- 22/05/2026 01:14:56 32168 
+nos-occasions.php                  -a---- 22/05/2026 01:14:56 70    
+nos-pieces.php                     -a---- 22/05/2026 01:14:56 68    
+politique-cookies.php              -a---- 22/05/2026 01:14:56 3191  
+postal_lookup.php                  -a---- 22/05/2026 01:14:56 755   
+REGLES-TRAVAIL.md                  -a---- 22/05/2026 01:14:56 2495  
+revision-scionzier.php             -a---- 22/05/2026 01:14:56 13761 
+robots.txt                         -a---- 22/05/2026 01:14:56 270   
+sitemap.xml                        -a---- 22/05/2026 01:14:58 2856  
+site-audit-20260522011946.txt      -a---- 22/05/2026 01:19:48 81    
+.env.example                       -a---- 22/05/2026 01:14:50 568   
+.env                               -a---- 22/05/2026 01:14:50 320   
+.ftpquota                          -a---- 22/05/2026 01:14:50 5     
+.htaccess                          -a---- 22/05/2026 01:14:50 1713  
+.htaccess.pagespeed.bkp            -a---- 22/05/2026 01:14:50 1194  
+.user.ini                          -a---- 22/05/2026 01:14:52 291   
+admin.php                          -a---- 22/05/2026 01:14:52 325688
+admin_gate.php                     -a---- 22/05/2026 01:14:52 13044 
+admin_session_status.php           -a---- 22/05/2026 01:14:52 415   
+config.php                         -a---- 22/05/2026 01:14:52 5237  
+config.production.example.php      -a---- 22/05/2026 01:14:52 2223  
+contact.php                        -a---- 22/05/2026 01:14:54 51051 
+DEPLOYMENT_PRODUCTION_CHECKLIST.md -a---- 22/05/2026 01:14:54 7186  
+faq.php                            -a---- 22/05/2026 01:14:54 22838 
+favicon.svg                        -a---- 22/05/2026 01:14:54 1732  
+garage-bonneville.php              -a---- 22/05/2026 01:14:54 13238 
+garage-cluses.php                  -a---- 22/05/2026 01:14:54 13368 
+garage-sallanches.php              -a---- 22/05/2026 01:14:54 13184 
+
+
+
+
+==== Counts and sizes ====
+
+Total files: 319
+Total size bytes: 24800631
+
+==== Top-level tree (one level) ====
+
+.git - files: 97
+.well-known - files: 0
+assets - files: 7
+cgi-bin - files: 0
+backups - files: 2
+catalogue - files: 3
+contact - files: 1
+data - files: 8
+deploy - files: 4
+site-restore-21mai2026 - files: 154
+devis - files: 1
+email-logs - files: 2
+includes - files: 1
+rdv - files: 1
+vendor - files: 8
+
+==== PHP files (first 200 entries) ====
+
+
+FullName                                                                        Length LastWriteTime      
+--------                                                                        ------ -------------      
+E:\google-oauth-setup.php                                                        13276 22/05/2026 01:14:54
+E:\google-reviews.php                                                             4620 22/05/2026 01:14:56
+E:\nos-occasions.php                                                                70 22/05/2026 01:14:56
+E:\nos-pieces.php                                                                   68 22/05/2026 01:14:56
+E:\politique-cookies.php                                                          3191 22/05/2026 01:14:56
+E:\postal_lookup.php                                                               755 22/05/2026 01:14:56
+E:\revision-scionzier.php                                                        13761 22/05/2026 01:14:56
+E:\admin.php                                                                    325688 22/05/2026 01:14:52
+E:\admin_gate.php                                                                13044 22/05/2026 01:14:52
+E:\admin_session_status.php                                                        415 22/05/2026 01:14:52
+E:\config.php                                                                     5237 22/05/2026 01:14:52
+E:\config.production.example.php                                                  2223 22/05/2026 01:14:52
+E:\contact.php                                                                   51051 22/05/2026 01:14:54
+E:\faq.php                                                                       22838 22/05/2026 01:14:54
+E:\garage-bonneville.php                                                         13238 22/05/2026 01:14:54
+E:\garage-cluses.php                                                             13368 22/05/2026 01:14:54
+E:\garage-sallanches.php                                                         13184 22/05/2026 01:14:54
+E:\catalogue\pieces.php                                                          28165 22/05/2026 01:15:56
+E:\catalogue\catalogue.php                                                       12030 22/05/2026 01:15:58
+E:\catalogue\occasion.php                                                        19636 22/05/2026 01:15:58
+E:\contact\contact.php                                                           50580 22/05/2026 01:16:02
+E:\site-restore-21mai2026\google-reviews.php                                      4620 22/05/2026 01:16:16
+E:\site-restore-21mai2026\nos-pieces.php                                            68 22/05/2026 01:16:16
+E:\site-restore-21mai2026\politique-cookies.php                                   3191 22/05/2026 01:16:16
+E:\site-restore-21mai2026\admin_session_status.php                                 415 22/05/2026 01:16:16
+E:\site-restore-21mai2026\admin_gate.php                                         13044 22/05/2026 01:16:18
+E:\site-restore-21mai2026\revision-scionzier.php                                 13761 22/05/2026 01:16:18
+E:\site-restore-21mai2026\garage-sallanches.php                                  13184 22/05/2026 01:16:18
+E:\site-restore-21mai2026\postal_lookup.php                                        755 22/05/2026 01:16:18
+E:\site-restore-21mai2026\config.php                                              5237 22/05/2026 01:16:20
+E:\site-restore-21mai2026\google-oauth-setup.php                                 13276 22/05/2026 01:16:20
+E:\site-restore-21mai2026\admin.php                                             325688 22/05/2026 01:16:20
+E:\site-restore-21mai2026\nos-occasions.php                                         70 22/05/2026 01:16:22
+E:\site-restore-21mai2026\garage-bonneville.php                                  13238 22/05/2026 01:16:22
+E:\site-restore-21mai2026\config.production.example.php                           2213 22/05/2026 01:16:22
+E:\site-restore-21mai2026\faq.php                                                23067 22/05/2026 01:16:22
+E:\site-restore-21mai2026\garage-cluses.php                                      13368 22/05/2026 01:16:24
+E:\site-restore-21mai2026\contact.php                                            52376 22/05/2026 01:16:24
+E:\site-restore-21mai2026\contact\contact.php                                    51905 22/05/2026 01:17:10
+E:\site-restore-21mai2026\includes\catalog_store.php                            237538 22/05/2026 01:17:12
+E:\site-restore-21mai2026\devis\devis.php                                        16675 22/05/2026 01:17:10
+E:\site-restore-21mai2026\rdv\rdv.php                                            24752 22/05/2026 01:17:12
+E:\site-restore-21mai2026\catalogue\pieces.php                                   28165 22/05/2026 01:17:12
+E:\site-restore-21mai2026\catalogue\catalogue.php                                12030 22/05/2026 01:17:12
+E:\site-restore-21mai2026\catalogue\occasion.php                                 19636 22/05/2026 01:17:12
+E:\site-restore-21mai2026\vendor\autoload.php                                      820 22/05/2026 01:17:14
+E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\SMTP.php                50657 22/05/2026 01:17:14
+E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\POP3.php                12820 22/05/2026 01:17:14
+E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\OAuth.php                3930 22/05/2026 01:17:14
+E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\PHPMailer.php          188166 22/05/2026 01:17:16
+E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\DSNConfigurator.php      7128 22/05/2026 01:17:16
+E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\OAuthTokenProvider.php   1582 22/05/2026 01:17:16
+E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\Exception.php            1296 22/05/2026 01:17:16
+E:\devis\devis.php                                                               16675 22/05/2026 01:16:14
+E:\includes\catalog_store.php                                                   237538 22/05/2026 01:16:16
+E:\rdv\rdv.php                                                                   24752 22/05/2026 01:16:16
+E:\vendor\autoload.php                                                             820 22/05/2026 01:17:22
+E:\vendor\phpmailer\phpmailer\src\POP3.php                                       12820 22/05/2026 01:17:24
+E:\vendor\phpmailer\phpmailer\src\SMTP.php                                       50657 22/05/2026 01:17:28
+E:\vendor\phpmailer\phpmailer\src\OAuth.php                                       3930 22/05/2026 01:17:26
+E:\vendor\phpmailer\phpmailer\src\PHPMailer.php                                 188166 22/05/2026 01:17:28
+E:\vendor\phpmailer\phpmailer\src\DSNConfigurator.php                             7128 22/05/2026 01:17:28
+E:\vendor\phpmailer\phpmailer\src\OAuthTokenProvider.php                          1582 22/05/2026 01:17:28
+E:\vendor\phpmailer\phpmailer\src\Exception.php                                   1296 22/05/2026 01:17:28
+
+
+
+
+==== PHP lint (syntax check) - summary ====
+
+E:\google-oauth-setup.php => No syntax errors detected in E:\google-oauth-setup.php
+E:\google-reviews.php => No syntax errors detected in E:\google-reviews.php
+E:\nos-occasions.php => No syntax errors detected in E:\nos-occasions.php
+E:\nos-pieces.php => No syntax errors detected in E:\nos-pieces.php
+E:\politique-cookies.php => No syntax errors detected in E:\politique-cookies.php
+E:\postal_lookup.php => No syntax errors detected in E:\postal_lookup.php
+E:\revision-scionzier.php => No syntax errors detected in E:\revision-scionzier.php
+E:\admin.php => No syntax errors detected in E:\admin.php
+E:\admin_gate.php => No syntax errors detected in E:\admin_gate.php
+E:\admin_session_status.php => No syntax errors detected in E:\admin_session_status.php
+E:\config.php => No syntax errors detected in E:\config.php
+E:\config.production.example.php => No syntax errors detected in E:\config.production.example.php
+E:\contact.php => No syntax errors detected in E:\contact.php
+E:\faq.php => No syntax errors detected in E:\faq.php
+E:\garage-bonneville.php => No syntax errors detected in E:\garage-bonneville.php
+E:\garage-cluses.php => No syntax errors detected in E:\garage-cluses.php
+E:\garage-sallanches.php => No syntax errors detected in E:\garage-sallanches.php
+E:\catalogue\pieces.php => No syntax errors detected in E:\catalogue\pieces.php
+E:\catalogue\catalogue.php => No syntax errors detected in E:\catalogue\catalogue.php
+E:\catalogue\occasion.php => No syntax errors detected in E:\catalogue\occasion.php
+E:\contact\contact.php => No syntax errors detected in E:\contact\contact.php
+E:\site-restore-21mai2026\google-reviews.php => No syntax errors detected in E:\site-restore-21mai2026\google-reviews.php
+E:\site-restore-21mai2026\nos-pieces.php => No syntax errors detected in E:\site-restore-21mai2026\nos-pieces.php
+E:\site-restore-21mai2026\politique-cookies.php => No syntax errors detected in E:\site-restore-21mai2026\politique-cookies.php
+E:\site-restore-21mai2026\admin_session_status.php => No syntax errors detected in E:\site-restore-21mai2026\admin_session_status.php
+E:\site-restore-21mai2026\admin_gate.php => No syntax errors detected in E:\site-restore-21mai2026\admin_gate.php
+E:\site-restore-21mai2026\revision-scionzier.php => No syntax errors detected in E:\site-restore-21mai2026\revision-scionzier.php
+E:\site-restore-21mai2026\garage-sallanches.php => No syntax errors detected in E:\site-restore-21mai2026\garage-sallanches.php
+E:\site-restore-21mai2026\postal_lookup.php => No syntax errors detected in E:\site-restore-21mai2026\postal_lookup.php
+E:\site-restore-21mai2026\config.php => No syntax errors detected in E:\site-restore-21mai2026\config.php
+E:\site-restore-21mai2026\google-oauth-setup.php => No syntax errors detected in E:\site-restore-21mai2026\google-oauth-setup.php
+E:\site-restore-21mai2026\admin.php => No syntax errors detected in E:\site-restore-21mai2026\admin.php
+E:\site-restore-21mai2026\nos-occasions.php => No syntax errors detected in E:\site-restore-21mai2026\nos-occasions.php
+E:\site-restore-21mai2026\garage-bonneville.php => No syntax errors detected in E:\site-restore-21mai2026\garage-bonneville.php
+E:\site-restore-21mai2026\config.production.example.php => No syntax errors detected in E:\site-restore-21mai2026\config.production.example.php
+E:\site-restore-21mai2026\faq.php => No syntax errors detected in E:\site-restore-21mai2026\faq.php
+E:\site-restore-21mai2026\garage-cluses.php => No syntax errors detected in E:\site-restore-21mai2026\garage-cluses.php
+E:\site-restore-21mai2026\contact.php => No syntax errors detected in E:\site-restore-21mai2026\contact.php
+E:\site-restore-21mai2026\contact\contact.php => No syntax errors detected in E:\site-restore-21mai2026\contact\contact.php
+E:\site-restore-21mai2026\includes\catalog_store.php => No syntax errors detected in E:\site-restore-21mai2026\includes\catalog_store.php
+E:\site-restore-21mai2026\devis\devis.php => No syntax errors detected in E:\site-restore-21mai2026\devis\devis.php
+E:\site-restore-21mai2026\rdv\rdv.php => No syntax errors detected in E:\site-restore-21mai2026\rdv\rdv.php
+E:\site-restore-21mai2026\catalogue\pieces.php => No syntax errors detected in E:\site-restore-21mai2026\catalogue\pieces.php
+E:\site-restore-21mai2026\catalogue\catalogue.php => No syntax errors detected in E:\site-restore-21mai2026\catalogue\catalogue.php
+E:\site-restore-21mai2026\catalogue\occasion.php => No syntax errors detected in E:\site-restore-21mai2026\catalogue\occasion.php
+E:\site-restore-21mai2026\vendor\autoload.php => No syntax errors detected in E:\site-restore-21mai2026\vendor\autoload.php
+E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\SMTP.php => No syntax errors detected in E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\SMTP.php
+E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\POP3.php => No syntax errors detected in E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\POP3.php
+E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\OAuth.php => No syntax errors detected in E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\OAuth.php
+E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\PHPMailer.php => No syntax errors detected in E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\PHPMailer.php
+E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\DSNConfigurator.php => No syntax errors detected in E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\DSNConfigurator.php
+E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\OAuthTokenProvider.php => No syntax errors detected in E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\OAuthTokenProvider.php
+E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\Exception.php => No syntax errors detected in E:\site-restore-21mai2026\vendor\phpmailer\phpmailer\src\Exception.php
+E:\devis\devis.php => No syntax errors detected in E:\devis\devis.php
+E:\includes\catalog_store.php => No syntax errors detected in E:\includes\catalog_store.php
+E:\rdv\rdv.php => No syntax errors detected in E:\rdv\rdv.php
+E:\vendor\autoload.php => No syntax errors detected in E:\vendor\autoload.php
+E:\vendor\phpmailer\phpmailer\src\POP3.php => No syntax errors detected in E:\vendor\phpmailer\phpmailer\src\POP3.php
+E:\vendor\phpmailer\phpmailer\src\SMTP.php => No syntax errors detected in E:\vendor\phpmailer\phpmailer\src\SMTP.php
+E:\vendor\phpmailer\phpmailer\src\OAuth.php => No syntax errors detected in E:\vendor\phpmailer\phpmailer\src\OAuth.php
+E:\vendor\phpmailer\phpmailer\src\PHPMailer.php => No syntax errors detected in E:\vendor\phpmailer\phpmailer\src\PHPMailer.php
+E:\vendor\phpmailer\phpmailer\src\DSNConfigurator.php => No syntax errors detected in E:\vendor\phpmailer\phpmailer\src\DSNConfigurator.php
+E:\vendor\phpmailer\phpmailer\src\OAuthTokenProvider.php => No syntax errors detected in E:\vendor\phpmailer\phpmailer\src\OAuthTokenProvider.php
+E:\vendor\phpmailer\phpmailer\src\Exception.php => No syntax errors detected in E:\vendor\phpmailer\phpmailer\src\Exception.php
+
+==== Occurrences of session_start ====
+
+E:\google-oauth-setup.php:7 -> session_start();
+E:\politique-cookies.php:6 -> session_start();
+E:\revision-scionzier.php:3 -> if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+E:\admin.php:2 -> session_start();
+E:\admin.php:1151 -> session_start();
+E:\admin_gate.php:8 -> session_start();
+E:\admin_session_status.php:5 -> session_start();
+E:\contact.php:6 -> session_start();
+E:\faq.php:3 -> if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+E:\garage-bonneville.php:3 -> if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+E:\garage-cluses.php:3 -> if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+E:\garage-sallanches.php:3 -> if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+E:\catalogue\pieces.php:5 -> session_start();
+E:\catalogue\catalogue.php:5 -> session_start();
+E:\catalogue\occasion.php:5 -> session_start();
+E:\contact\contact.php:6 -> session_start();
+E:\site-restore-21mai2026\politique-cookies.php:6 -> session_start();
+E:\site-restore-21mai2026\admin_session_status.php:5 -> session_start();
+E:\site-restore-21mai2026\admin_gate.php:8 -> session_start();
+E:\site-restore-21mai2026\revision-scionzier.php:3 -> if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+E:\site-restore-21mai2026\garage-sallanches.php:3 -> if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+E:\site-restore-21mai2026\google-oauth-setup.php:7 -> session_start();
+E:\site-restore-21mai2026\admin.php:2 -> session_start();
+E:\site-restore-21mai2026\admin.php:1151 -> session_start();
+E:\site-restore-21mai2026\garage-bonneville.php:3 -> if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+E:\site-restore-21mai2026\faq.php:3 -> if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+E:\site-restore-21mai2026\garage-cluses.php:3 -> if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
+E:\site-restore-21mai2026\contact.php:6 -> session_start();
+E:\site-restore-21mai2026\contact\contact.php:6 -> session_start();
+E:\site-restore-21mai2026\includes\catalog_store.php:24 -> session_start();
+E:\site-restore-21mai2026\devis\devis.php:5 -> session_start();
+E:\site-restore-21mai2026\rdv\rdv.php:6 -> session_start();
+E:\site-restore-21mai2026\catalogue\pieces.php:5 -> session_start();
+E:\site-restore-21mai2026\catalogue\catalogue.php:5 -> session_start();
+E:\site-restore-21mai2026\catalogue\occasion.php:5 -> session_start();
+E:\devis\devis.php:5 -> session_start();
+E:\includes\catalog_store.php:24 -> session_start();
+E:\rdv\rdv.php:6 -> session_start();
+
+==== Files with content before <?php (preview) ====
+
+
+==== Detect UTF-8 BOM in PHP files ====
+
+
+==== Search for potentially dangerous functions ====
+
+Pattern: exec\(
+Pattern: system\(
+Pattern: shell_exec\(
+Pattern: passthru\(
+Pattern: popen\(
+Pattern: proc_open\(
+Pattern: eval\(
+Pattern: base64_decode\(
+Pattern: preg_replace\(.*/e
+
+==== Search for DB / SMTP / email constants ====
+
+
+==== Dependencies ====
+
+vendor/ exists
+composer.json missing
+
+==== Backups and deploy scripts ====
+
+
+FullName                                                         LastWriteTime      
+--------                                                         -------------      
+E:\backups                                                       22/05/2026 01:15:50
+E:\data\devis_config.backup-20260520-1506                        22/05/2026 01:16:08
+E:\deploy                                                        22/05/2026 01:16:10
+E:\site-restore-21mai2026\data\devis_config.backup-20260520-1506 22/05/2026 01:17:22
+E:\site-restore-21mai2026\DEPLOYMENT_PRODUCTION_CHECKLIST.md     22/05/2026 01:16:22
+E:\DEPLOYMENT_PRODUCTION_CHECKLIST.md                            22/05/2026 01:14:54
+
+
+
+
+==== Git repository info ====
+
+Git repo found
+
+==== PHP runtime ====
+
+PHP 8.3.30 (cli) (built: Jan 13 2026 22:50:40) (ZTS Visual C++ 2019 x64)
+Copyright (c) The PHP Group
+Zend Engine v4.3.30, Copyright (c) Zend Technologies
+[PHP Modules]
+bcmath
+calendar
+Core
+ctype
+curl
+date
+dom
+filter
+gd
+hash
+iconv
+json
+libxml
+mysqli
+mysqlnd
+openssl
+pcre
+PDO
+pdo_mysql
+Phar
+random
+readline
+Reflection
+session
+SimpleXML
+SPL
+standard
+tokenizer
+xml
+xmlreader
+xmlwriter
+zlib
+
+[Zend Modules]
+
+
+==== SEO files ====
+
+
+FullName                              Length LastWriteTime      
+--------                              ------ -------------      
+E:\site-restore-21mai2026\sitemap.xml   2856 22/05/2026 01:16:16
+E:\site-restore-21mai2026\robots.txt     270 22/05/2026 01:16:22
+E:\robots.txt                            270 22/05/2026 01:14:56
+E:\sitemap.xml                          2856 22/05/2026 01:14:58
+
+
+
+
+==== Quick heuristics ====
+
+session_start found in contact.php or includes; inspect headers/outputs
+
+==== Audit complete ====
+
+Audit completed at: 05/22/2026 01:20:20

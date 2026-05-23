@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /admin.php
+Disallow: /admin_gate.php
+Disallow: /google-oauth-setup.php
+Disallow: /politique-cookies.php
+Disallow: /data/
+Disallow: /includes/
+Disallow: /vendor/
+Disallow: /tmp/
+
+Sitemap: https://www.clinikauto.fr/sitemap.xml

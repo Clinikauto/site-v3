@@ -108,6 +108,7 @@ catalog_track_visit('local_revision_scionzier');
             <li><a href="index.html">Accueil</a></li>
             <li><a href="catalogue/catalogue.php">Catalogue</a></li>
             <li><a href="devis/devis.php">Devis gratuit</a></li>
+            <li><a href="rdv/rdv.php">Rendez-vous</a></li>
             <li><a href="contact/contact.php">Contact</a></li>
             <?php if ($showAdminReturn): ?><li><a href="admin.php">Retour admin</a></li><?php endif; ?>
         </ul>

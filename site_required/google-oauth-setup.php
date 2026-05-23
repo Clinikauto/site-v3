@@ -15,11 +15,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         exit;
     }
 }
-
-// Garantir démarrage de la session si nécessaire (includes/security.php l'initialise normalement)
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
+session_start();
 
 // Configuration
 const CLIENT_ID_PLACEHOLDER = 'xxx.apps.googleusercontent.com';

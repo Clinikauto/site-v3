@@ -20,23 +20,18 @@ $cookieParams = [
     'httponly' => true,
     'samesite' => 'Lax'
 ];
-
-// Ne réinitialiser les paramètres de session et démarrer la session
-// que si aucune session n'est déjà active (évite les warnings "headers already sent").
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    if (PHP_VERSION_ID >= 70300) {
-        session_set_cookie_params($cookieParams);
-    } else {
-        session_set_cookie_params(
-            $cookieParams['lifetime'],
-            $cookieParams['path'],
-            $cookieParams['domain'],
-            $cookieParams['secure'],
-            $cookieParams['httponly']
-        );
-    }
-    session_start();
+if (PHP_VERSION_ID >= 70300) {
+    session_set_cookie_params($cookieParams);
+} else {
+    session_set_cookie_params(
+        $cookieParams['lifetime'],
+        $cookieParams['path'],
+        $cookieParams['domain'],
+        $cookieParams['secure'],
+        $cookieParams['httponly']
+    );
 }
+session_start();
 
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
