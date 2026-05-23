@@ -124,7 +124,6 @@ define('DRY_RUN_MODE', catalog_env_value('DRY_RUN_MODE', (CATALOG_IS_LOCAL_RUNTI
 
 // ===== ACCES ADMINISTRATEUR =====
 define('ADMIN_LOGIN', 'clinikauto74@gmail.com');
-define('ADMIN_PASSWORD_HASH', catalog_env_value('ADMIN_PASSWORD_HASH', '$2y$10$FCHO3tzKz8.5hpztYE1dnO/DELLAvvRc5DomNYErk5lMm6Nk6VW8O'));
 define('ADMIN_PASSWORD_RESET_EMAIL', 'admin@clinikauto.fr');
 define('ADMIN_HIDDEN_ENTRY_ENABLED', CATALOG_IS_LOCAL_RUNTIME ? false : true);
 define('ADMIN_HIDDEN_ENTRY_KEY', catalog_env_value('ADMIN_HIDDEN_ENTRY_KEY', '2mdopgLxiG4CN6PE7BcsHj5urJXyfzD8'));

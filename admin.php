@@ -8,7 +8,6 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 }
 
 require_once __DIR__ . '/includes/catalog_store.php';
-require_once __DIR__ . '/includes/catalog_store.php';
 require_once __DIR__ . '/includes/security.php';
 
 // CSRF pour les requêtes POST : en développement local on tolère l'absence
@@ -78,24 +77,28 @@ function admin_is_authenticated_session_valid()
 function admin_normalize_spec_label($label)
 {
     $label = trim((string) $label);
-    $label = strtr($label, [
-        'à' => 'a', 'â' => 'a', '├ñ' => 'a',
-        'ç' => 'c',
-        'é' => 'e', 'è' => 'e', 'ê' => 'e', '├½' => 'e',
-        '├«' => 'i', '├»' => 'i',
-        'ô' => 'o', '├Â' => 'o',
-        'ù' => 'u', 'û' => 'u', '├╝' => 'u',
-        '├┐' => 'y',
-        '├Ç' => 'a', '├é' => 'a', '├ä' => 'a',
-        '├ç' => 'c',
-        'ë' => 'e', '├ê' => 'e', '├è' => 'e', '├ï' => 'e',
-        '├Ä' => 'i', '├Å' => 'i',
-        '├ö' => 'o', '├û' => 'o',
-        '├Ö' => 'u', '├ø' => 'u', '├£' => 'u',
-        '┼©' => 'y'
-    ]);
+    if ($label === '') {
+        return '';
+    }
+
+    // Prefer the intl Normalizer when available for robust unicode handling
+    if (extension_loaded('intl') && class_exists('Normalizer')) {
+        $label = Normalizer::normalize($label, Normalizer::FORM_KD);
+        // remove diacritic marks
+        $label = preg_replace('/\p{Mn}/u', '', $label);
+    } else {
+        // Fallback: transliterate to ASCII when possible
+        $trans = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $label);
+        if ($trans !== false && trim($trans) !== '') {
+            $label = $trans;
+        }
+    }
+
     $label = strtolower($label);
-    return preg_replace('/\s+/', ' ', $label);
+    // remove non-alnum except spaces and hyphens
+    $label = preg_replace('/[^a-z0-9\-\s]/', '', $label);
+    $label = preg_replace('/\s+/', ' ', $label);
+    return trim($label);
 }
 
 function admin_known_spec_labels($type)
@@ -785,42 +788,60 @@ function admin_rdv_is_completed($appointment)
 
 function admin_update_password_hash_in_config($newHash)
 {
-    $configPath = __DIR__ . '/config.php';
-    $content = @file_get_contents($configPath);
-    if ($content === false) {
-        return [false, 'Impossible de lire config.php'];
+    // Nouveau mode: stockage du hash dans un fichier sécurisé sous data/
+    $path = __DIR__ . '/data/admin_password.json';
+    $dir = dirname($path);
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0775, true);
     }
 
-    $escapedHash = str_replace(['\\', "'"], ['\\\\', "\\'"], (string) $newHash);
-    $replacement = "define('ADMIN_PASSWORD_HASH', '" . $escapedHash . "');";
-    $updated = preg_replace("/define\\(\\s*['\"]ADMIN_PASSWORD_HASH['\"]\\s*,\\s*['\"][^'\"]*['\"]\\s*\\);/", $replacement, $content, 1, $count);
+    $payload = json_encode([
+        'hash' => (string) $newHash,
+        'updated_at' => time()
+    ], JSON_UNESCAPED_SLASHES);
 
-    if ($updated === null || (int) $count !== 1) {
-        return [false, 'Impossible de mettre à jour le hash admin dans config.php'];
+    if ($payload === false) {
+        return [false, 'Erreur lors de la creation du contenu JSON'];
     }
 
-    $written = @file_put_contents($configPath, $updated);
+    $written = @file_put_contents($path, $payload, LOCK_EX);
     if ($written === false) {
-        return [false, 'ëcriture refusée sur config.php (droits insuffisants)'];
+        return [false, 'Écriture refusée sur ' . $path . ' (droits insuffisants)'];
     }
 
-    return [true, 'Mot de passe administrateur mis à jour dans config.php'];
+    return [true, 'Mot de passe administrateur sauvegardé dans data (reconnexion requise)'];
 }
 
 function admin_verify_password($plainPassword)
 {
-    $stored = defined('ADMIN_PASSWORD_HASH') ? (string) ADMIN_PASSWORD_HASH : '';
-    if ($stored === '') {
+    // Priorité : lire le hash depuis data/admin_password.json si présent
+    $path = __DIR__ . '/data/admin_password.json';
+    if (file_exists($path)) {
+        $raw = @file_get_contents($path);
+        if ($raw !== false && trim($raw) !== '') {
+            $decoded = json_decode($raw, true);
+            if (is_array($decoded) && !empty($decoded['hash'])) {
+                $stored = (string) $decoded['hash'];
+                $algoInfo = password_get_info($stored);
+                if (($algoInfo['algo'] ?? 0) !== 0) {
+                    return password_verify((string) $plainPassword, $stored);
+                }
+                return hash_equals($stored, (string) $plainPassword);
+            }
+        }
+    }
+
+    // Fallback: compatibilite avec la constante dans config.php
+    $storedConst = defined('ADMIN_PASSWORD_HASH') ? (string) ADMIN_PASSWORD_HASH : '';
+    if ($storedConst === '') {
         return false;
     }
 
-    $algoInfo = password_get_info($stored);
+    $algoInfo = password_get_info($storedConst);
     if (($algoInfo['algo'] ?? 0) !== 0) {
-        return password_verify((string) $plainPassword, $stored);
+        return password_verify((string) $plainPassword, $storedConst);
     }
-
-    // Compatibilite: si une valeur en clair est stockee dans config.php.
-    return hash_equals($stored, (string) $plainPassword);
+    return hash_equals($storedConst, (string) $plainPassword);
 }
 
 function admin_reset_file_path()
