@@ -36,3 +36,12 @@ SECURITY_ECHO_REPORT.txt
 # Editor / OS
 Thumbs.db
 desktop.ini
+
+# Files/tools not needed in repo
+composer.phar
+admin_gate.php.bak*
+site_extras/
+site_required/site_required/
+data/devis_config.backup*
+"fin de session.bat"
+"reprise de session.bat"

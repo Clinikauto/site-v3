@@ -50,3 +50,8 @@
 {"timestamp":"2026-05-19T11:13:12+02:00","action":"rdv_complete","status":"success","ip":"88.182.222.61","context":{"rdv_id":69}}
 {"timestamp":"2026-05-22T09:17:34+02:00","action":"admin_view","status":"db_unavailable_json_fallback","ip":"::1","context":[]}
 {"timestamp":"2026-05-22T09:18:05+02:00","action":"admin_view","status":"db_unavailable_json_fallback","ip":"::1","context":[]}
+{"timestamp":"2026-05-23T22:39:09+02:00","action":"admin_view","status":"db_unavailable_json_fallback","ip":"127.0.0.1","context":[]}
+{"timestamp":"2026-05-23T22:41:02+02:00","action":"admin_view","status":"db_unavailable_json_fallback","ip":"127.0.0.1","context":[]}
+{"timestamp":"2026-05-23T22:41:25+02:00","action":"admin_view","status":"db_unavailable_json_fallback","ip":"127.0.0.1","context":[]}
+{"timestamp":"2026-05-23T22:44:42+02:00","action":"admin_view","status":"db_unavailable_json_fallback","ip":"127.0.0.1","context":[]}
+{"timestamp":"2026-05-23T22:45:28+02:00","action":"admin_view","status":"db_unavailable_json_fallback","ip":"127.0.0.1","context":[]}
