@@ -1,0 +1,14 @@
+# Dossiers/fichiers a ne jamais deployer
+site-restore-21mai2026/**
+email-logs/**
+backups/**
+.git/**
+.gitignore
+.vscode/**
+*.zip
+*.sha256
+*.log
+
+# Fichiers locaux optionnels
+*.local.php
+config.local.php

@@ -1,0 +1,38 @@
+# Ignored files for ClinikAuto repository
+# Environment / local config
+.env
+.user.ini
+.ftpquota
+
+# Python / venv
+.venv/
+
+# VSCode
+.vscode/
+
+# Backups and restore dumps (keep one zip externally)
+backups/*.zip
+backups/*.zip.sha256
+site-restore-*/
+
+# Generated outputs / test artifacts
+out_*.html
+t*.html
+web_faq.html
+served_style_after.css
+
+# Git temp / corrupt folders
+.git_corrupt_*/
+site-v3-clone/
+site-v3-git-temp/
+
+# Push/merge logs
+push_output*.txt
+push_*.txt
+merge*.txt
+main_status.txt
+SECURITY_ECHO_REPORT.txt
+
+# Editor / OS
+Thumbs.db
+desktop.ini

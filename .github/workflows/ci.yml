@@ -1,0 +1,30 @@
+name: CI - Tests
+
+on:
+  push:
+    branches: [ main, 'feature/*' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-windows:
+    name: Run tests on Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+
+      - name: Start PHP dev server
+        shell: pwsh
+        run: |
+          Start-Process -NoNewWindow -FilePath php -ArgumentList '-S localhost:8000 -t .' -PassThru | Out-Null
+          Start-Sleep -Seconds 2
+
+      - name: Run contact tests
+        shell: pwsh
+        run: |
+          pwsh -File .\scripts\run_contact_tests.ps1
