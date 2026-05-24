@@ -42,7 +42,7 @@ catalog_track_visit('local_cluses');
                 "name": "Clinik Auto",
                 "description": "Garage automobile à Scionzier (74950), à 5 min de Cluses. Révision, entretien, réparation multimarque, vente de véhicules d'occasion et pièces auto contrôlées.",
                 "url": "https://www.clinikauto.fr/",
-                "logo": "https://www.clinikauto.fr/assets/logo.png",
+                "logo": "https://www.clinikauto.fr/assets/logo.avif",
                 "telephone": "+33620185627",
                 "email": "clinikauto74@gmail.com",
                 "address": {

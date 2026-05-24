@@ -43,7 +43,7 @@ catalog_track_visit('local_revision_scionzier');
                 "name": "Clinik Auto",
                 "description": "Garage automobile à Scionzier (74950) spécialisé dans la révision, l'entretien et la réparation multimarque en Haute-Savoie.",
                 "url": "https://www.clinikauto.fr/",
-                "logo": "https://www.clinikauto.fr/assets/logo.png",
+                "logo": "https://www.clinikauto.fr/assets/logo.avif",
                 "telephone": "+33620185627",
                 "email": "clinikauto74@gmail.com",
                 "address": {

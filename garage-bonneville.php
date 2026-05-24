@@ -42,7 +42,7 @@ catalog_track_visit('local_bonneville');
                 "name": "Clinik Auto",
                 "description": "Garage automobile à Scionzier (74950), desservant Bonneville, Cluses, Sallanches et toute la vallée de l'Arve.",
                 "url": "https://www.clinikauto.fr/",
-                "logo": "https://www.clinikauto.fr/assets/logo.png",
+                "logo": "https://www.clinikauto.fr/assets/logo.avif",
                 "telephone": "+33620185627",
                 "email": "clinikauto74@gmail.com",
                 "address": {

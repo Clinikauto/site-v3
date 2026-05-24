@@ -42,7 +42,7 @@ catalog_track_visit('local_sallanches');
                 "name": "Clinik Auto",
                 "description": "Garage automobile à Scionzier (74950), desservant Sallanches, Cluses, Bonneville et toute la Haute-Savoie.",
                 "url": "https://www.clinikauto.fr/",
-                "logo": "https://www.clinikauto.fr/assets/logo.png",
+                "logo": "https://www.clinikauto.fr/assets/logo.avif",
                 "telephone": "+33620185627",
                 "email": "clinikauto74@gmail.com",
                 "address": {
