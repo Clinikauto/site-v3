@@ -72,13 +72,13 @@ $devisStructuredData = [
     <meta property="og:title" content="Devis Gratuit Révision & Réparation Auto | Clinik Auto Scionzier (74)">
     <meta property="og:description" content="Demandez un devis gratuit pour révision ou réparation auto chez Clinik Auto à Scionzier (74950). Garage multimarque Haute-Savoie.">
     <meta property="og:url" content="https://www.clinikauto.fr/devis/devis.php">
-    <meta property="og:image" content="https://www.clinikauto.fr/assets/logo.png">
+    <meta property="og:image" content="https://www.clinikauto.fr/assets/logo.avif">
     <meta property="og:locale" content="fr_FR">
     <meta property="og:site_name" content="Clinik Auto">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Devis Gratuit | Clinik Auto Scionzier (74)">
     <meta name="twitter:description" content="Devis gratuit révision & réparation auto chez Clinik Auto, Scionzier (74950). Réponse rapide.">
-    <link rel="icon" type="image/png" href="../assets/logo.png">
+    <link rel="icon" type="image/png" href="../assets/logo.avif">
     <link rel="stylesheet" href="../assets/style.css">
     <script type="application/ld+json">
         <?php echo json_encode($devisStructuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
@@ -88,7 +88,7 @@ $devisStructuredData = [
     <header>
         <div class="site-brand">
             <a class="site-brand-link" href="../index.html" aria-label="Clinik Auto accueil">
-                <img class="site-logo" src="../assets/logo.png" alt="Logo Clinik Auto">
+                <img class="site-logo" src="../assets/logo.avif" alt="Logo Clinik Auto">
             </a>
         </div>
         <nav>

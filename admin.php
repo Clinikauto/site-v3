@@ -1786,7 +1786,7 @@ $partConditionSuggestions = admin_merge_suggestions(
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administration annonces - Clinik Auto</title>
-    <link rel="icon" type="image/png" href="assets/logo.png">
+    <link rel="icon" type="image/png" href="assets/logo.avif">
     <link rel="stylesheet" href="assets/style.css">
     <script src="assets/postal-city.js" defer></script>
     <script src="assets/customer-type.js" defer></script>
@@ -1796,7 +1796,7 @@ $partConditionSuggestions = admin_merge_suggestions(
     <header>
         <div class="site-brand">
             <a class="site-brand-link" href="index.html" aria-label="Clinik Auto accueil">
-                <img class="site-logo" src="assets/logo.png" alt="Logo Clinik Auto">
+                <img class="site-logo" src="assets/logo.avif" alt="Logo Clinik Auto">
             </a>
         </div>
         <nav>

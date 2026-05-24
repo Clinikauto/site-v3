@@ -20,10 +20,10 @@ catalog_track_visit('local_bonneville');
     <meta property="og:title" content="Garage Auto proche Bonneville (74130) | Clinik Auto">
     <meta property="og:description" content="Votre garage automobile à 15 min de Bonneville à Scionzier (74950). Révision, réparation, vente VO. Devis gratuit.">
     <meta property="og:url" content="https://www.clinikauto.fr/garage-bonneville.php">
-    <meta property="og:image" content="https://www.clinikauto.fr/assets/logo.png">
+    <meta property="og:image" content="https://www.clinikauto.fr/assets/logo.avif">
     <meta property="og:locale" content="fr_FR">
     <meta property="og:site_name" content="Clinik Auto">
-    <link rel="icon" type="image/png" href="assets/logo.png">
+    <link rel="icon" type="image/png" href="assets/logo.avif">
     <link rel="stylesheet" href="assets/style.css">
     <script type="application/ld+json">
     {
@@ -86,7 +86,7 @@ catalog_track_visit('local_bonneville');
 <header>
     <div class="site-brand">
         <a class="site-brand-link" href="index.html" aria-label="Clinik Auto accueil">
-            <img class="site-logo" src="assets/logo.png" alt="Logo Clinik Auto">
+            <img class="site-logo" src="assets/logo.avif" alt="Logo Clinik Auto">
         </a>
     </div>
     <nav>

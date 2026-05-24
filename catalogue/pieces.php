@@ -99,13 +99,13 @@ $piecesStructuredData = [
     <meta property="og:title" content="Pièces Auto d'Occasion à Scionzier (74) | Clinik Auto">
     <meta property="og:description" content="Pièces détachées automobiles d'occasion contrôlées chez Clinik Auto à Scionzier (74950). Jantes, freinage, moteur, carrosserie en Haute-Savoie.">
     <meta property="og:url" content="https://www.clinikauto.fr/catalogue/pieces.php">
-    <meta property="og:image" content="https://www.clinikauto.fr/assets/logo.png">
+    <meta property="og:image" content="https://www.clinikauto.fr/assets/logo.avif">
     <meta property="og:locale" content="fr_FR">
     <meta property="og:site_name" content="Clinik Auto">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Pièces Auto d'Occasion à Scionzier (74) | Clinik Auto">
     <meta name="twitter:description" content="Pièces détachées auto d'occasion contrôlées chez Clinik Auto, Scionzier (74950).">
-    <link rel="icon" type="image/png" href="../assets/logo.png">
+    <link rel="icon" type="image/png" href="../assets/logo.avif">
     <link rel="stylesheet" href="../assets/style.css">
     <?php echo catalog_get_google_analytics_script(); ?>
     <script type="application/ld+json">
@@ -116,7 +116,7 @@ $piecesStructuredData = [
     <header>
         <div class="site-brand">
             <a class="site-brand-link" href="../index.html" aria-label="Clinik Auto accueil">
-                <img class="site-logo" src="../assets/logo.png" alt="Logo Clinik Auto">
+                <img class="site-logo" src="../assets/logo.avif" alt="Logo Clinik Auto">
             </a>
         </div>
         <nav>
