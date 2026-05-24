@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # redirige logo.png vers logo.avif en 301
+  RewriteCond %{REQUEST_URI} ^/assets/logo\.png$ [NC]
+  RewriteRule ^ /assets/logo.avif [R=301,L]
+</IfModule>
+
+# Fallback pour serveurs sans mod_rewrite (ex: certaines configurations PHP dev)
+<IfModule !mod_rewrite.c>
+  <Files "logo.png">
+    Redirect 301 /assets/logo.png /assets/logo.avif
+  </Files>
+</IfModule>
