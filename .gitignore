@@ -1,19 +1,47 @@
+# Ignored files for ClinikAuto repository
+# Environment / local config
 .env
-data/admin_gate_code.json
-data/admin_ops.log
-data/catalog_data.json
-data/admin_password_reset.json
-email-logs/*.json
-cookies.txt
-process_cmd.txt
-mailhog.exe
-*.log
+.user.ini
+.ftpquota
 
-# Artefacts temporaires / debug
-*.bak
-*.new
-tmp_*.php
-test_*.php
-diag_*.ps1
-diag_*.php
-extracted_section.txt
+# Python / venv
+.venv/
+
+# VSCode
+.vscode/
+
+# Backups and restore dumps (keep one zip externally)
+backups/*.zip
+backups/*.zip.sha256
+site-restore-*/
+
+# Generated outputs / test artifacts
+out_*.html
+t*.html
+web_faq.html
+served_style_after.css
+
+# Git temp / corrupt folders
+.git_corrupt_*/
+site-v3-clone/
+site-v3-git-temp/
+
+# Push/merge logs
+push_output*.txt
+push_*.txt
+merge*.txt
+main_status.txt
+SECURITY_ECHO_REPORT.txt
+
+# Editor / OS
+Thumbs.db
+desktop.ini
+
+# Files/tools not needed in repo
+composer.phar
+admin_gate.php.bak*
+site_extras/
+site_required/site_required/
+data/devis_config.backup*
+"fin de session.bat"
+"reprise de session.bat"

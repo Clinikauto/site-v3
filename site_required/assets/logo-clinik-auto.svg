@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" role="img" aria-labelledby="title desc">
+  <title id="title">Logo Clinik Auto</title>
+  <desc id="desc">Logo style mascotte avec camion rouge souriant, outils croisés, cercle bleu et bannière Clinik Auto.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#78e4ff"/>
+      <stop offset="100%" stop-color="#1698d4"/>
+    </linearGradient>
+    <linearGradient id="truck" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ff4b59"/>
+      <stop offset="100%" stop-color="#ce112d"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f2f5f9"/>
+      <stop offset="100%" stop-color="#a9b4c0"/>
+    </linearGradient>
+    <linearGradient id="banner" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0%" stop-color="#d71531"/>
+      <stop offset="100%" stop-color="#ff304b"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="9" stdDeviation="10" flood-color="#0f172a" flood-opacity="0.26"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <g transform="translate(450 148)">
+      <circle r="118" fill="url(#sky)" stroke="#0f172a" stroke-width="10"/>
+      <circle r="98" fill="none" stroke="#ffffff" stroke-width="6" stroke-dasharray="2 12" stroke-linecap="round" opacity="0.7"/>
+      <g stroke="#0f172a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M-165 -94l-62 74"/>
+        <path d="M-208 -125l58 47"/>
+        <path d="M165 -94l62 74"/>
+        <path d="M208 -125l-58 47"/>
+      </g>
+      <g fill="url(#metal)" stroke="#0f172a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M-232 -127c16 0 28 12 28 28s-12 28-28 28" fill="none"/>
+        <path d="M-260 -70l62-62"/>
+        <path d="M232 -127c-16 0-28 12-28 28s12 28 28 28" fill="none"/>
+        <path d="M260 -70l-62-62"/>
+        <path d="M-273 24c-19 0-33 14-33 33s14 33 33 33" fill="none"/>
+        <path d="M273 24c19 0 33 14 33 33s-14 33-33 33" fill="none"/>
+      </g>
+      <g fill="#ffffff" opacity="0.95">
+        <path d="M-226 -148l10 24 24 10-24 10-10 24-10-24-24-10 24-10z"/>
+        <path d="M250 -110l8 18 18 8-18 8-8 18-8-18-18-8 18-8z"/>
+      </g>
+      <g transform="translate(0 -2)">
+        <path d="M-79 -24c8-30 36-50 68-50h22c32 0 60 20 68 50l14 49c9 5 15 16 15 28v39c0 21-17 38-38 38h-11c-15 0-28-8-35-21h-88c-7 13-20 21-35 21h-11c-21 0-38-17-38-38V53c0-12 6-23 15-28l14-49z" fill="url(#truck)" stroke="#0f172a" stroke-width="9" stroke-linejoin="round"/>
+        <path d="M-55 -26c8-21 24-33 45-33h20c21 0 37 12 45 33l10 33h-130l10-33z" fill="#9beeff" stroke="#0f172a" stroke-width="9" stroke-linejoin="round"/>
+        <path d="M-44 -15h88" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round" opacity="0.7"/>
+        <path d="M-53 9h106" fill="none" stroke="#0f172a" stroke-width="5" stroke-linecap="round" opacity="0.25"/>
+        <circle cx="-64" cy="51" r="19" fill="#ffffff" stroke="#0f172a" stroke-width="8"/>
+        <circle cx="64" cy="51" r="19" fill="#ffffff" stroke="#0f172a" stroke-width="8"/>
+        <circle cx="-64" cy="51" r="9" fill="#41d8ff"/>
+        <circle cx="64" cy="51" r="9" fill="#41d8ff"/>
+        <circle cx="-90" cy="87" r="8" fill="#ffbe2e" stroke="#0f172a" stroke-width="4"/>
+        <circle cx="90" cy="87" r="8" fill="#ffbe2e" stroke="#0f172a" stroke-width="4"/>
+        <circle cx="-24" cy="-1" r="17" fill="#ffffff" stroke="#0f172a" stroke-width="7"/>
+        <circle cx="24" cy="-1" r="17" fill="#ffffff" stroke="#0f172a" stroke-width="7"/>
+        <circle cx="-28" cy="-4" r="5" fill="#0f172a"/>
+        <circle cx="20" cy="-4" r="5" fill="#0f172a"/>
+        <circle cx="-18" cy="-10" r="2.5" fill="#ffffff"/>
+        <circle cx="30" cy="-10" r="2.5" fill="#ffffff"/>
+        <path d="M-46 82c16 20 76 20 92 0v20c-10 16-32 26-46 26s-36-10-46-26z" fill="#0f172a"/>
+        <path d="M-28 101c10 12 46 12 56 0" fill="none" stroke="#ffffff" stroke-width="8" stroke-linecap="round"/>
+        <path d="M-10 110c6 2 14 2 20 0-1 10-5 16-10 16s-9-6-10-16z" fill="#ff5a74"/>
+        <path d="M-36 24h72" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round" opacity="0.9"/>
+        <path d="M-36 24h14M-8 24h16M22 24h14" fill="none" stroke="#e52337" stroke-width="10" stroke-linecap="round"/>
+        <path d="M-16 -75h32" fill="none" stroke="#0f172a" stroke-width="8" stroke-linecap="round"/>
+        <path d="M-46 -88h92" fill="none" stroke="#ff4053" stroke-width="9" stroke-linecap="round"/>
+        <path d="M-58 -88h6M52 -88h6" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round"/>
+        <path d="M-26 126h52" fill="none" stroke="#d9e0e8" stroke-width="10" stroke-linecap="round"/>
+        <rect x="-18" y="118" width="36" height="20" rx="5" fill="#ffffff" stroke="#0f172a" stroke-width="6"/>
+      </g>
+      <g transform="translate(-256 84)" fill="url(#metal)" stroke="#0f172a" stroke-width="7">
+        <circle cx="0" cy="0" r="26"/>
+        <circle cx="0" cy="0" r="11" fill="#41d8ff"/>
+        <path d="M0-42v16M0 42V26M42 0H26M-42 0h16M30-30L18-18M-30 30l12-12M30 30L18 18M-30-30l12 12" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(256 84)" fill="url(#metal)" stroke="#0f172a" stroke-width="7">
+        <circle cx="0" cy="0" r="26"/>
+        <circle cx="0" cy="0" r="11" fill="#41d8ff"/>
+        <path d="M0-42v16M0 42V26M42 0H26M-42 0h16M30-30L18-18M-30 30l12-12M30 30L18 18M-30-30l12 12" stroke-linecap="round"/>
+      </g>
+    </g>
+    <g transform="translate(450 255)">
+      <path d="M-290 10l54-18h472l54 18-18 74H-272z" fill="url(#banner)" stroke="#0f172a" stroke-width="9" stroke-linejoin="round"/>
+      <path d="M-220 74h440" fill="none" stroke="#0f172a" stroke-width="14" stroke-linecap="round"/>
+      <text x="0" y="53" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-size="104" fill="#ffffff" stroke="#0f172a" stroke-width="12" paint-order="stroke">CLINIK</text>
+      <text x="0" y="108" text-anchor="middle" font-family="Georgia, serif" font-size="50" font-weight="700" letter-spacing="7" fill="#ffffff">AUTO</text>
+    </g>
+  </g>
+</svg>

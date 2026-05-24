@@ -1,0 +1,38 @@
+{
+    "ok": true,
+    "fetched_at": 1779015633,
+    "source": "live",
+    "place_name": "Clinik Auto",
+    "rating": 4.70000000000000017763568394002504646778106689453125,
+    "user_ratings_total": 47,
+    "google_url": "https://maps.google.com/?cid=18009660473704265557",
+    "reviews": [
+        {
+            "author_name": "Stephane Phénix",
+            "rating": 5,
+            "text": "Parfait merci.\nJe recommande fortement.",
+            "relative_time_description": "il y a 7 mois",
+            "time": 1759732151,
+            "author_url": "https://www.google.com/maps/contrib/109721008212045605845/reviews",
+            "profile_photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjV2PeALz3uYyUTjQZUrCUaKNER2G1p5I3by9Tp6v-cZDlvu9tcu=s128-c0x00000000-cc-rp-mo-ba5"
+        },
+        {
+            "author_name": "Anthony Clouye",
+            "rating": 5,
+            "text": "Vérification de la voiture avant contrôle technique.\nRésultats du contrôle technique identique en tout point à la vérification.\nTrès professionnel",
+            "relative_time_description": "il y a 7 mois",
+            "time": 1758718906,
+            "author_url": "https://www.google.com/maps/contrib/105657944221639136570/reviews",
+            "profile_photo_url": "https://lh3.googleusercontent.com/a/ACg8ocIdvXtAg_hTNZ2txminuGeefid2y5OGPncOBGWGZdzZT575jA=s128-c0x00000000-cc-rp-mo"
+        },
+        {
+            "author_name": "Franny Osula",
+            "rating": 5,
+            "text": "",
+            "relative_time_description": "il y a 7 mois",
+            "time": 1758717878,
+            "author_url": "https://www.google.com/maps/contrib/114538957983761960586/reviews",
+            "profile_photo_url": "https://lh3.googleusercontent.com/a-/ALV-UjWSmW6HCTqS4lA3Txy3GQE13aRq0QrRfsfit6vkpOTabUE3VsU=s128-c0x00000000-cc-rp-mo"
+        }
+    ]
+}
