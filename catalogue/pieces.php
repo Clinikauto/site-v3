@@ -14,10 +14,6 @@ $selectedId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $selected = $selectedId > 0 ? catalog_find_item($selectedId, 'part') : null;
 $selectedBankAccount = catalog_bank_account_selected();
 
-if (!$selected && !empty($items)) {
-    $selected = $items[0];
-}
-
 $deposit = $selected ? number_format(catalog_reservation_amount($selected['price']), 2, ',', ' ') : '0,00';
 $selectedDepositRaw = $selected ? (float) catalog_reservation_amount($selected['price']) : 0.0;
 $selectedCurrentRequest = $selected ? catalog_part_current_request($selected) : null;
@@ -111,6 +107,7 @@ $piecesStructuredData = [
     <script type="application/ld+json">
         <?php echo json_encode($piecesStructuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
     </script>
+    <?php if (function_exists('csrf_print_meta_and_js')) { csrf_print_meta_and_js(); } ?>
 </head>
 <body class="public-page">
     <header>
@@ -155,7 +152,7 @@ $piecesStructuredData = [
                                 <span class="inventory-price"><?php echo catalog_escape(catalog_format_price($item['price'])); ?> €</span>
                                 <span class="status-pill <?php echo ($item['status'] ?? '') === 'reserved' ? 'is-muted' : ''; ?>"><?php echo catalog_escape(catalog_status_label($item)); ?></span>
                                 <?php if (($item['status'] ?? '') !== 'reserved' && empty($item['transaction_in_progress'])): ?>
-                                    <label class="part-selector-line" onclick="event.preventDefault(); event.stopPropagation();">
+                                    <label class="part-selector-line">
                                         <input
                                             type="checkbox"
                                             class="part-selector"
@@ -209,7 +206,7 @@ $piecesStructuredData = [
                     </div>
 
                     <div class="deposit-note">
-                        <strong>Acompte de réservation :</strong> <?php echo $deposit; ?> € par virement instantané, soit 30 % du montant affiché.
+                        <strong>Acompte de réservation :</strong> <?php echo catalog_escape((string) $deposit); ?> € par virement instantané, soit 30 % du montant affiché.
                     </div>
 
                     <div class="deposit-note multi-deposit-note">
@@ -255,6 +252,11 @@ $piecesStructuredData = [
                                 <button type="button" class="btn-secondary" id="pieces-continue-btn">Continuer la navigation →</button>
                             </div>
                         <?php endif; ?>
+                    </div>
+                <?php elseif (!empty($items)): ?>
+                    <div class="detail-card detail-card-placeholder">
+                        <h3>Selectionnez une annonce</h3>
+                        <p>La liste affiche l'integralite des pieces publiees et leur statut. Cliquez sur une annonce pour ouvrir sa fiche detaillee.</p>
                     </div>
                 <?php else: ?>
                     <p>Aucune annonce pièce n'est disponible pour le moment.</p>
@@ -412,9 +414,27 @@ $piecesStructuredData = [
         };
 
         selectors.forEach(function (checkbox) {
-            checkbox.addEventListener('change', function () {
+            var selectorLine = checkbox.closest('.part-selector-line');
+
+            // Prevent the parent row link from hijacking selection clicks.
+            checkbox.addEventListener('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+                checkbox.checked = !checkbox.checked;
                 syncSelectedFromCheckboxes();
             });
+
+            if (selectorLine) {
+                selectorLine.addEventListener('click', function (event) {
+                    if (event.target === checkbox) {
+                        return;
+                    }
+                    event.preventDefault();
+                    event.stopPropagation();
+                    checkbox.checked = !checkbox.checked;
+                    syncSelectedFromCheckboxes();
+                });
+            }
         });
 
         restoreSelection();
@@ -469,6 +489,7 @@ $piecesStructuredData = [
         if (piecesContinueBtn) {
             piecesContinueBtn.addEventListener('click', function () {
                 syncSelectedFromCheckboxes();
+                alert('Vos choix restent actifs pendant votre navigation sur le site et seront conservés jusqu\'à l\'envoi final de votre demande.');
                 window.location.href = 'catalogue.php';
             });
         }

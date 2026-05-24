@@ -30,7 +30,6 @@ $showAdminReturn = catalog_is_admin_session_active();
             <ul>
                 <li><a href="index.html">Accueil</a></li>
                 <li><a href="contact/contact.php">Contact</a></li>
-                <li><a href="rdv/rdv.php">Rendez-vous</a></li>
                 <?php if ($showAdminReturn): ?>
                     <li><a href="admin.php">Retour admin</a></li>
                 <?php endif; ?>
@@ -38,10 +37,11 @@ $showAdminReturn = catalog_is_admin_session_active();
         </nav>
     </header>
 
-    <main>
+    <main class="page-main-hero">
         <section>
-            <h2>Politique cookies</h2>
-            <p>Cette page explique l'utilisation des cookies sur le site Clinik Auto.</p>
+            <span class="hero-badge">📌 Politique de confidentialité</span>
+            <h1>Politique cookies &amp; vie privée</h1>
+            <p>Informations sur l’utilisation des cookies sur le site Clinik Auto.</p>
         </section>
 
         <section class="spaced-section">
@@ -59,16 +59,13 @@ $showAdminReturn = catalog_is_admin_session_active();
 
             <h3>5. Contact</h3>
             <p>Pour toute question: <a href="mailto:clinikauto74@gmail.com">clinikauto74@gmail.com</a>.</p>
-
-            <h3>6. Propriete intellectuelle</h3>
-            <p>L'ensemble des contenus du site Clinik Auto (textes, images, graphismes, logo, structure, scripts, code source et base de donnees) est protege par le droit d'auteur et le droit de la propriete intellectuelle.</p>
-            <p>Toute reproduction, representation, adaptation, extraction ou reutilisation, totale ou partielle, sur tout support, sans autorisation ecrite prealable de Clinik Auto, est interdite.</p>
-            <p>Tous droits reserves. Pour toute demande d'autorisation: <a href="mailto:clinikauto74@gmail.com">clinikauto74@gmail.com</a>.</p>
         </section>
     </main>
 
     <footer>
         <p>&copy; 2026 Clinik Auto. Tous droits reserves.</p>
     </footer>
+<button class="site-back-top-floating" id="site-back-top" aria-label="Retour en haut de la page">↑</button>
+<script>!function(){var b=document.getElementById('site-back-top');if(!b)return;window.addEventListener('scroll',function(){b.classList.toggle('is-visible',window.scrollY>420);},{passive:true});b.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});}();</script>
 </body>
 </html>

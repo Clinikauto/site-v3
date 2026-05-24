@@ -81,6 +81,7 @@ catalog_track_visit('local_bonneville');
     }
     </script>
     <?php echo catalog_get_google_analytics_script(); ?>
+    <?php if (function_exists('csrf_print_meta_and_js')) { csrf_print_meta_and_js(); } ?>
 </head>
 <body class="public-page">
 <header>
@@ -94,14 +95,13 @@ catalog_track_visit('local_bonneville');
             <li><a href="index.html">Accueil</a></li>
             <li><a href="catalogue/catalogue.php">Catalogue</a></li>
             <li><a href="devis/devis.php">Devis gratuit</a></li>
-            <li><a href="rdv/rdv.php">Rendez-vous</a></li>
             <li><a href="contact/contact.php">Contact</a></li>
             <?php if ($showAdminReturn): ?><li><a href="admin.php">Retour admin</a></li><?php endif; ?>
         </ul>
     </nav>
 </header>
 
-<main>
+<main class="page-main-hero">
     <section>
         <nav aria-label="Fil d'Ariane">
             <ol class="breadcrumb-list">
@@ -156,7 +156,7 @@ catalog_track_visit('local_bonneville');
     <section class="spaced-section">
         <h2>Comment venir depuis Bonneville ?</h2>
         <p>Depuis <strong>Bonneville (74130)</strong>, prenez la direction de Cluses/Scionzier via la <strong>D1205</strong> (environ 15 minutes). L'atelier est au <strong>118 Clos des Teppes, 74950 Scionzier</strong>. Parking gratuit sur place.</p>
-        <p style="margin-top:0.75rem;">Vous pouvez aussi <a href="rdv/rdv.php">prendre rendez-vous en ligne</a> pour choisir le créneau qui vous convient et éviter l'attente à votre arrivée.</p>
+        <p style="margin-top:0.75rem;">Vous pouvez aussi <a href="contact/contact.php">nous contacter</a> pour choisir le créneau qui vous convient et éviter l'attente à votre arrivée.</p>
     </section>
 
     <section class="cta-section">
@@ -164,7 +164,7 @@ catalog_track_visit('local_bonneville');
         <p>Un entretien à prévoir ? Une réparation urgente ? Contactez Clinik Auto dès maintenant.</p>
         <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-top:1rem;">
             <a href="devis/devis.php" class="cta-link">Demande de devis gratuit</a>
-            <a href="rdv/rdv.php" class="cta-link-secondary">Prendre rendez-vous</a>
+            <a href="contact/contact.php">Prendre rendez-vous</a>
             <a href="tel:+33620185627" class="cta-link-secondary">📞 06 20 18 56 27</a>
         </div>
     </section>
@@ -205,6 +205,8 @@ catalog_track_visit('local_bonneville');
     </p>
     <p class="footer-copy">&copy; 2026 Clinik Auto. Tous droits r&eacute;serv&eacute;s.</p>
 </footer>
+<button class="site-back-top-floating" id="site-back-top" aria-label="Retour en haut de la page">↑</button>
+<script>!function(){var b=document.getElementById('site-back-top');if(!b)return;window.addEventListener('scroll',function(){b.classList.toggle('is-visible',window.scrollY>420);},{passive:true});b.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});}();</script>
 <script src="assets/conversion-tracking.js" defer></script>
 </body>
 </html>

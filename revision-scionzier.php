@@ -94,6 +94,7 @@ catalog_track_visit('local_revision_scionzier');
     }
     </script>
     <?php echo catalog_get_google_analytics_script(); ?>
+    <?php if (function_exists('csrf_print_meta_and_js')) { csrf_print_meta_and_js(); } ?>
 </head>
 <body class="public-page">
 <header>
@@ -107,14 +108,13 @@ catalog_track_visit('local_revision_scionzier');
             <li><a href="index.html">Accueil</a></li>
             <li><a href="catalogue/catalogue.php">Catalogue</a></li>
             <li><a href="devis/devis.php">Devis gratuit</a></li>
-            <li><a href="rdv/rdv.php">Rendez-vous</a></li>
             <li><a href="contact/contact.php">Contact</a></li>
             <?php if ($showAdminReturn): ?><li><a href="admin.php">Retour admin</a></li><?php endif; ?>
         </ul>
     </nav>
 </header>
 
-<main>
+<main class="page-main-hero">
     <section>
         <nav aria-label="Fil d'Ariane">
             <ol class="breadcrumb-list">
@@ -182,7 +182,7 @@ catalog_track_visit('local_revision_scionzier');
         <p>Indiquez votre véhicule et le type d'entretien souhaité : nous vous répondons dans les meilleurs délais avec un devis détaillé.</p>
         <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-top:1rem;">
             <a href="devis/devis.php?service=revision" class="cta-link">Devis révision gratuit</a>
-            <a href="rdv/rdv.php" class="cta-link-secondary">Prendre rendez-vous</a>
+            <a href="contact/contact.php">Prendre rendez-vous</a>
             <a href="tel:+33620185627" class="cta-link-secondary">📞 06 20 18 56 27</a>
         </div>
     </section>
@@ -220,5 +220,7 @@ catalog_track_visit('local_revision_scionzier');
     </p>
     <p class="footer-copy">&copy; 2026 Clinik Auto. Tous droits r&eacute;serv&eacute;s.</p>
 </footer>
+<button class="site-back-top-floating" id="site-back-top" aria-label="Retour en haut de la page">↑</button>
+<script>!function(){var b=document.getElementById('site-back-top');if(!b)return;window.addEventListener('scroll',function(){b.classList.toggle('is-visible',window.scrollY>420);},{passive:true});b.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});}();</script>
 </body>
 </html>
