@@ -1,8 +1,28 @@
 <?php
 
 $catalogConfigPath = dirname(__DIR__) . '/config.php';
+
+// Définit le chemin du store JSON si la constante n'est pas fournie ailleurs
+if (!defined('CATALOG_STORE_PATH')) {
+    define('CATALOG_STORE_PATH', dirname(__DIR__) . '/data/catalog_data.json');
+}
+
 if (is_file($catalogConfigPath)) {
     require_once $catalogConfigPath;
+}
+
+// Fournit le meta + loader JS pour Analytics (lu par les templates)
+function catalog_get_google_analytics_script()
+{
+    $gaId = (string) (defined('GOOGLE_ANALYTICS_ID') ? GOOGLE_ANALYTICS_ID : '');
+    $escaped = htmlspecialchars($gaId, ENT_QUOTES, 'UTF-8');
+    $html = '';
+    $html .= "<link rel=\"stylesheet\" href=\"/assets/analytics-cookie.css\">\n";
+    if ($escaped !== '') {
+        $html .= "<meta name=\"clinik-ga-id\" content=\"" . $escaped . "\">\n";
+    }
+    $html .= "<script src=\"/assets/analytics-cookie.js\" defer></script>\n";
+    return $html;
 }
 
 function catalog_admin_session_timeout_seconds()
@@ -27,7 +47,7 @@ function catalog_is_admin_session_active()
     if (empty($_SESSION['catalog_admin']) || $_SESSION['catalog_admin'] !== true) {
         return false;
     }
-
+    
     if (!isset($_SESSION['catalog_admin_gate_ok']) || $_SESSION['catalog_admin_gate_ok'] !== true) {
         return false;
     }
@@ -48,253 +68,6 @@ function catalog_is_admin_session_active()
 
     $_SESSION['catalog_admin_last_activity'] = time();
     return true;
-}
-
-function catalog_google_is_local_runtime()
-{
-    $httpHost = (string) ($_SERVER['HTTP_HOST'] ?? '');
-    if (in_array($httpHost, ['127.0.0.1:8001', 'localhost:8001', '127.0.0.1', 'localhost'], true)) {
-        return true;
-    }
-
-    $remoteAddr = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
-    if (in_array($remoteAddr, ['127.0.0.1', '::1'], true)) {
-        return true;
-    }
-
-    return PHP_SAPI === 'cli' && DIRECTORY_SEPARATOR === '\\';
-}
-
-function catalog_google_curl_apply_local_ssl_fallback($ch)
-{
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-}
-
-define('CATALOG_STORE_PATH', dirname(__DIR__) . '/data/catalog_data.json');
-
-function catalog_get_google_analytics_script()
-{
-    $gaId = (string) (defined('GOOGLE_ANALYTICS_ID') ? GOOGLE_ANALYTICS_ID : '');
-    if (empty($gaId)) {
-        return '';
-    }
-
-    $escaped = htmlspecialchars($gaId, ENT_QUOTES, 'UTF-8');
-    return <<<GA
-<!-- Cookie consent + Google Analytics 4 -->
-<style>
-    .cookie-banner-clinik {
-        position: fixed;
-        left: 16px;
-        right: 16px;
-        bottom: 16px;
-        z-index: 99999;
-        background: #111827;
-        color: #f9fafb;
-        border-radius: 12px;
-        padding: 14px;
-        box-shadow: 0 12px 30px rgba(0,0,0,.35);
-        font-size: 14px;
-        line-height: 1.45;
-        display: none;
-        gap: 12px;
-        align-items: center;
-        justify-content: space-between;
-        flex-wrap: wrap;
-    }
-    .cookie-banner-clinik p {
-        margin: 0;
-        max-width: 720px;
-    }
-    .cookie-banner-clinik a {
-        color: #93c5fd;
-        text-decoration: underline;
-    }
-    .cookie-banner-actions {
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-    .cookie-btn-clinik {
-        border: 0;
-        border-radius: 8px;
-        padding: 8px 12px;
-        cursor: pointer;
-        font-weight: 700;
-    }
-    .cookie-btn-accept { background: #16a34a; color: #fff; }
-    .cookie-btn-reject { background: #374151; color: #fff; }
-    .cookie-btn-settings {
-        position: fixed;
-        right: 16px;
-        bottom: 16px;
-        z-index: 99998;
-        border: 0;
-        border-radius: 999px;
-        padding: 10px 14px;
-        background: #111827;
-        color: #fff;
-        cursor: pointer;
-        font-size: 13px;
-        display: none;
-    }
-</style>
-<script>
-    (function () {
-        var GA_ID = '{$escaped}';
-        var CONSENT_KEY = 'clinikauto_cookie_analytics_v1';
-        var gaLoaded = false;
-
-        function eraseCookie(name) {
-            var hostParts = window.location.hostname.split('.');
-            var domains = [window.location.hostname];
-            if (hostParts.length > 2) {
-                domains.push('.' + hostParts.slice(-2).join('.'));
-            }
-            var paths = ['/', window.location.pathname || '/'];
-            for (var i = 0; i < domains.length; i++) {
-                for (var j = 0; j < paths.length; j++) {
-                    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=' + paths[j] + '; domain=' + domains[i];
-                }
-            }
-            document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
-        }
-
-        function disableAnalyticsCookies() {
-            window['ga-disable-' + GA_ID] = true;
-            eraseCookie('_ga');
-            eraseCookie('_gid');
-            eraseCookie('_gat');
-        }
-
-        function loadAnalytics() {
-            if (gaLoaded || window['ga-disable-' + GA_ID]) {
-                return;
-            }
-            gaLoaded = true;
-            var s = document.createElement('script');
-            s.async = true;
-            s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(GA_ID);
-            document.head.appendChild(s);
-
-            window.dataLayer = window.dataLayer || [];
-            window.gtag = function(){ window.dataLayer.push(arguments); };
-            window.gtag('js', new Date());
-            window.gtag('config', GA_ID, { anonymize_ip: true });
-        }
-
-        function setConsent(value) {
-            try {
-                localStorage.setItem(CONSENT_KEY, value);
-            } catch (e) {}
-        }
-
-        function getConsent() {
-            try {
-                return localStorage.getItem(CONSENT_KEY) || '';
-            } catch (e) {
-                return '';
-            }
-        }
-
-        function hideBanner(showSettingsButton) {
-            var banner = document.getElementById('cookie-banner-clinik');
-            var settings = document.getElementById('cookie-settings-clinik');
-            if (banner) {
-                banner.style.display = 'none';
-            }
-            if (settings) {
-                settings.style.display = showSettingsButton ? 'inline-block' : 'none';
-            }
-        }
-
-        function showBanner() {
-            var banner = document.getElementById('cookie-banner-clinik');
-            var settings = document.getElementById('cookie-settings-clinik');
-            if (banner) {
-                banner.style.display = 'flex';
-            }
-            if (settings) {
-                settings.style.display = 'none';
-            }
-        }
-
-        function setupRejectedReprompt() {
-            if (window.__clinikCookieRepromptBound) {
-                return;
-            }
-            window.__clinikCookieRepromptBound = true;
-
-            var reprompt = function () {
-                if (getConsent() === 'rejected') {
-                    showBanner();
-                }
-            };
-
-            document.addEventListener('click', reprompt, true);
-            document.addEventListener('submit', reprompt, true);
-            document.addEventListener('keydown', reprompt, true);
-        }
-
-        function mountBanner() {
-            if (document.getElementById('cookie-banner-clinik')) {
-                return;
-            }
-            var banner = document.createElement('div');
-            banner.id = 'cookie-banner-clinik';
-            banner.className = 'cookie-banner-clinik';
-            banner.innerHTML = '' +
-                '<p>Nous utilisons des cookies de mesure d\'audience pour améliorer le site. Vous pouvez accepter ou refuser. <a href="/politique-cookies.php">Politique cookies</a>.</p>' +
-                '<div class="cookie-banner-actions">' +
-                    '<button type="button" class="cookie-btn-clinik cookie-btn-reject" id="cookie-reject-clinik">Refuser</button>' +
-                    '<button type="button" class="cookie-btn-clinik cookie-btn-accept" id="cookie-accept-clinik">Accepter</button>' +
-                '</div>';
-            document.body.appendChild(banner);
-
-            var settings = document.createElement('button');
-            settings.type = 'button';
-            settings.id = 'cookie-settings-clinik';
-            settings.className = 'cookie-btn-settings';
-            settings.textContent = 'Cookies';
-            document.body.appendChild(settings);
-
-            document.getElementById('cookie-accept-clinik').addEventListener('click', function () {
-                setConsent('accepted');
-                window['ga-disable-' + GA_ID] = false;
-                loadAnalytics();
-                hideBanner(false);
-            });
-
-            document.getElementById('cookie-reject-clinik').addEventListener('click', function () {
-                setConsent('rejected');
-                disableAnalyticsCookies();
-                hideBanner(true);
-            });
-
-            settings.addEventListener('click', function () {
-                showBanner();
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            mountBanner();
-            setupRejectedReprompt();
-            var consent = getConsent();
-            if (consent === 'accepted') {
-                loadAnalytics();
-                hideBanner(false);
-            } else if (consent === 'rejected') {
-                disableAnalyticsCookies();
-                hideBanner(true);
-            } else {
-                showBanner();
-            }
-        });
-    })();
-</script>
-<!-- End cookie consent + Google Analytics 4 -->
-GA;
 }
 
 function catalog_set_runtime_error($message)
@@ -325,7 +98,7 @@ function catalog_get_runtime_error()
 
 function catalog_store_path()
 {
-    return CATALOG_STORE_PATH;
+    return defined('CATALOG_STORE_PATH') ? CATALOG_STORE_PATH : (dirname(__DIR__) . '/data/catalog_data.json');
 }
 
 function catalog_bank_accounts_file_path()
@@ -967,52 +740,17 @@ function catalog_devis_config_save_to_db($connection, $normalized, $archiveMissi
 
         if ($archiveMissing) {
             if (!empty($activeCategoryIds)) {
-                // Use prepared statements to avoid SQL injection for IN lists
-                $placeholders = implode(',', array_fill(0, count($activeCategoryIds), '?'));
-                $sqlCats = "UPDATE catalog_devis_categories SET is_archived = 1, updated_at = CURRENT_TIMESTAMP WHERE category_id NOT IN ($placeholders)";
-                $stmtCats = $connection->prepare($sqlCats);
-                if (!$stmtCats) {
-                    throw new Exception('Prepare failed for categories archive');
-                }
-                $types = str_repeat('s', count($activeCategoryIds));
-                $params = array_merge([$types], $activeCategoryIds);
-                $refs = [];
-                foreach ($params as $k => $v) { $refs[$k] = &$params[$k]; }
-                call_user_func_array([$stmtCats, 'bind_param'], $refs);
-                $stmtCats->execute();
-                $stmtCats->close();
-
-                $sqlOpts = "UPDATE catalog_devis_options SET is_archived = 1, updated_at = CURRENT_TIMESTAMP WHERE category_id NOT IN ($placeholders)";
-                $stmtOpts = $connection->prepare($sqlOpts);
-                if (!$stmtOpts) {
-                    throw new Exception('Prepare failed for options archive');
-                }
-                // reuse same params
-                $refs2 = [];
-                foreach ($params as $k => $v) { $refs2[$k] = &$params[$k]; }
-                call_user_func_array([$stmtOpts, 'bind_param'], $refs2);
-                $stmtOpts->execute();
-                $stmtOpts->close();
+                $escapedCategories = array_map([$connection, 'real_escape_string'], $activeCategoryIds);
+                $connection->query("UPDATE catalog_devis_categories SET is_archived = 1, updated_at = CURRENT_TIMESTAMP WHERE category_id NOT IN ('" . implode("','", $escapedCategories) . "')");
+                $connection->query("UPDATE catalog_devis_options SET is_archived = 1, updated_at = CURRENT_TIMESTAMP WHERE category_id NOT IN ('" . implode("','", $escapedCategories) . "')");
             } else {
                 $connection->query('UPDATE catalog_devis_categories SET is_archived = 1, updated_at = CURRENT_TIMESTAMP');
                 $connection->query('UPDATE catalog_devis_options SET is_archived = 1, updated_at = CURRENT_TIMESTAMP');
             }
 
             if (!empty($activeOptionIds)) {
-                // Prepared statement for option_id NOT IN (...) safely
-                $placeholdersOpt = implode(',', array_fill(0, count($activeOptionIds), '?'));
-                $sqlOpt = "UPDATE catalog_devis_options SET is_archived = 1, updated_at = CURRENT_TIMESTAMP WHERE option_id NOT IN ($placeholdersOpt)";
-                $stmtOpt = $connection->prepare($sqlOpt);
-                if (!$stmtOpt) {
-                    throw new Exception('Prepare failed for option_id archive');
-                }
-                $typesOpt = str_repeat('s', count($activeOptionIds));
-                $paramsOpt = array_merge([$typesOpt], $activeOptionIds);
-                $refsOpt = [];
-                foreach ($paramsOpt as $k => $v) { $refsOpt[$k] = &$paramsOpt[$k]; }
-                call_user_func_array([$stmtOpt, 'bind_param'], $refsOpt);
-                $stmtOpt->execute();
-                $stmtOpt->close();
+                $escapedOptions = array_map([$connection, 'real_escape_string'], $activeOptionIds);
+                $connection->query("UPDATE catalog_devis_options SET is_archived = 1, updated_at = CURRENT_TIMESTAMP WHERE option_id NOT IN ('" . implode("','", $escapedOptions) . "')");
             } else {
                 $connection->query('UPDATE catalog_devis_options SET is_archived = 1, updated_at = CURRENT_TIMESTAMP');
             }
