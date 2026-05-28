@@ -22,14 +22,14 @@ catalog_track_visit('faq_page');
     <meta property="og:title" content="FAQ Clinik Auto | Garage automobile a Scionzier (74)">
     <meta property="og:description" content="Toutes les reponses aux questions clients sur nos prestations, la qualite de notre travail, les rendez-vous, la revision, les pieces et les VO.">
     <meta property="og:url" content="https://www.clinikauto.fr/faq.php">
-    <meta property="og:image" content="https://www.clinikauto.fr/assets/logo.png">
+    <meta property="og:image" content="https://www.clinikauto.fr/assets/logo.avif">
     <meta property="og:locale" content="fr_FR">
     <meta property="og:site_name" content="Clinik Auto">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="FAQ Clinik Auto | Scionzier">
     <meta name="twitter:description" content="FAQ clients Clinik Auto : prestations, qualite du travail, revision, garantie, pieces et rendez-vous.">
-    <meta name="twitter:image" content="https://www.clinikauto.fr/assets/logo.png">
-    <link rel="icon" type="image/png" href="assets/logo.png">
+    <meta name="twitter:image" content="https://www.clinikauto.fr/assets/logo.avif">
+    <link rel="icon" type="image/png" href="assets/logo.avif">
     <link rel="stylesheet" href="assets/style.css">
     <script type="application/ld+json">
     {
@@ -47,7 +47,7 @@ catalog_track_visit('faq_page');
                 "@id": "https://www.clinikauto.fr/#garage",
                 "name": "Clinik Auto",
                 "url": "https://www.clinikauto.fr/",
-                "logo": "https://www.clinikauto.fr/assets/logo.png",
+                "logo": "https://www.clinikauto.fr/assets/logo.avif",
                 "telephone": "+33620185627",
                 "email": "clinikauto74@gmail.com",
                 "address": {
@@ -210,7 +210,7 @@ catalog_track_visit('faq_page');
 <header>
     <div class="site-brand">
         <a class="site-brand-link" href="index.html" aria-label="Clinik Auto accueil">
-            <img class="site-logo" src="assets/logo.png" alt="Logo Clinik Auto">
+            <img class="site-logo" src="assets/logo.avif" alt="Logo Clinik Auto">
         </a>
     </div>
     <nav>

@@ -23,7 +23,7 @@ $showAdminReturn = catalog_is_admin_session_active();
     <header>
         <div class="site-brand">
             <a class="site-brand-link" href="index.html" aria-label="Clinik Auto accueil">
-                <img class="site-logo" src="assets/logo.png" alt="Logo Clinik Auto">
+                <img class="site-logo" src="assets/logo.avif" alt="Logo Clinik Auto">
             </a>
         </div>
         <nav>

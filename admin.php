@@ -2368,6 +2368,8 @@ if ($isAuthenticated && ($adminDbAvailable ?? false) && ($_GET['action'] ?? '') 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administration annonces - Clinik Auto</title>
+    <link rel="icon" type="image/avif" href="assets/logo.avif">
+    <link rel="icon" type="image/webp" href="assets/logo.webp">
     <link rel="icon" type="image/png" href="assets/logo.png">
     <link rel="stylesheet" href="assets/style.css?v=<?php echo (int) (@filemtime(__DIR__ . '/assets/style.css') ?: time()); ?>">
     <?php if (function_exists('csrf_print_meta_and_js')) { csrf_print_meta_and_js(); } ?>
@@ -2525,7 +2527,11 @@ if ($isAuthenticated && ($adminDbAvailable ?? false) && ($_GET['action'] ?? '') 
     <header>
         <div class="site-brand">
             <a class="site-brand-link" href="index.html" aria-label="Clinik Auto accueil">
-                <img class="site-logo" src="assets/logo.png" alt="Logo Clinik Auto">
+                <picture>
+                    <source type="image/avif" srcset="assets/logo.avif" />
+                    <source type="image/webp" srcset="assets/logo.webp" />
+                    <img class="site-logo" src="assets/logo.png" alt="Logo Clinik Auto" decoding="async" loading="eager" width="240" height="234">
+                </picture>
             </a>
         </div>
         <nav>

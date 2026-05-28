@@ -814,13 +814,13 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
     <meta property="og:title" content="Contact & Devis Gratuit | Clinik Auto Scionzier (74)">
     <meta property="og:description" content="Contactez Clinik Auto à Scionzier (74950) par téléphone ou email. Devis gratuit pour révision, réparation ou achat de véhicule.">
     <meta property="og:url" content="https://www.clinikauto.fr/contact/contact.php">
-    <meta property="og:image" content="https://www.clinikauto.fr/assets/logo.png">
+    <meta property="og:image" content="https://www.clinikauto.fr/assets/logo.avif">
     <meta property="og:locale" content="fr_FR">
     <meta property="og:site_name" content="Clinik Auto">
     <meta name="twitter:card" content="summary">
     <meta name="twitter:title" content="Contact & Devis | Clinik Auto Scionzier (74)">
     <meta name="twitter:description" content="Contactez Clinik Auto à Scionzier. Tél : 06 20 18 56 27. Devis gratuit en ligne.">
-    <link rel="icon" type="image/png" href="../assets/logo.png">
+    <link rel="icon" type="image/png" href="../assets/logo.avif">
     <link rel="stylesheet" href="../assets/style.css">
     <script src="../assets/postal-city.js" defer></script>
     <script src="../assets/customer-type.js" defer></script>
@@ -834,7 +834,7 @@ if ($virement_lock_mode && trim((string) ($form_data["virement_compte_id"] ?? ""
     <header>
         <div class="site-brand">
             <a class="site-brand-link" href="../index.html" aria-label="Clinik Auto accueil">
-                <img class="site-logo" src="../assets/logo.png" alt="Logo Clinik Auto">
+                <img class="site-logo" src="../assets/logo.avif" alt="Logo Clinik Auto">
             </a>
         </div>
         <nav>

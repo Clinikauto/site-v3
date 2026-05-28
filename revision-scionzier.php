@@ -21,10 +21,10 @@ catalog_track_visit('local_revision_scionzier');
     <meta property="og:title" content="Révision Auto Scionzier (74950) | Clinik Auto">
     <meta property="og:description" content="Révision, entretien et vidange auto à Scionzier. Clinik Auto – garage multimarque. Devis gratuit – 06 20 18 56 27.">
     <meta property="og:url" content="https://www.clinikauto.fr/revision-scionzier.php">
-    <meta property="og:image" content="https://www.clinikauto.fr/assets/logo.png">
+    <meta property="og:image" content="https://www.clinikauto.fr/assets/logo.avif">
     <meta property="og:locale" content="fr_FR">
     <meta property="og:site_name" content="Clinik Auto">
-    <link rel="icon" type="image/png" href="assets/logo.png">
+    <link rel="icon" type="image/png" href="assets/logo.avif">
     <link rel="stylesheet" href="assets/style.css">
     <script type="application/ld+json">
     {
@@ -43,7 +43,7 @@ catalog_track_visit('local_revision_scionzier');
                 "name": "Clinik Auto",
                 "description": "Garage automobile à Scionzier (74950) spécialisé dans la révision, l'entretien et la réparation multimarque en Haute-Savoie.",
                 "url": "https://www.clinikauto.fr/",
-                "logo": "https://www.clinikauto.fr/assets/logo.png",
+                "logo": "https://www.clinikauto.fr/assets/logo.avif",
                 "telephone": "+33620185627",
                 "email": "clinikauto74@gmail.com",
                 "address": {
@@ -100,7 +100,7 @@ catalog_track_visit('local_revision_scionzier');
 <header>
     <div class="site-brand">
         <a class="site-brand-link" href="index.html" aria-label="Clinik Auto accueil">
-            <img class="site-logo" src="assets/logo.png" alt="Logo Clinik Auto">
+                <img class="site-logo" src="assets/logo.avif" alt="Logo Clinik Auto">
         </a>
     </div>
     <nav>
