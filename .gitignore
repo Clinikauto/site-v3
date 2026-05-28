@@ -45,3 +45,17 @@ site_required/site_required/
 data/devis_config.backup*
 "fin de session.bat"
 "reprise de session.bat"
+
+# Debug / temporary files generated during local tests
+CLINIKAUTO.*.zip
+dbg_*
+dbg-get_*
+dbg-get-*
+post_*
+post-headers*
+rdv_body*
+rdv_headers*
+assets/analytics-cookie.*
+"espace de de travail vs code.code-workspace"
+tools/backup_*.ps1
+tools/create_backups.ps1
